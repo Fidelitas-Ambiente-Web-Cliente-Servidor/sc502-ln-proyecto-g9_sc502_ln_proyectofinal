@@ -31,7 +31,7 @@ function handleLogin() {
   }
 
   if (valido) {
-    // Simular nombre desde correo (se reemplazará con PHP/MySQL)
+    // Simular nombre desde correo
     let nombre = correo.split("@")[0];
     guardarSesion(nombre);
     mostrarAlerta("alertaLogin", "✅ Sesión iniciada correctamente. Redirigiendo...", "success");
