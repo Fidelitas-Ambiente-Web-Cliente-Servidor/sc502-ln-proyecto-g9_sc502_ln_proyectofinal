@@ -1,0 +1,252 @@
+
+/* ---------- Variables globales ---------- */
+:root {
+  --color-primario: #2E75B6;
+  --color-secundario: #1A4A7A;
+  --color-acento: #4CAF82;
+  --color-fondo: #F4F8FB;
+  --color-texto: #2C3E50;
+  --color-alerta: #E67E22;
+  --sombra: 0 4px 16px rgba(46, 117, 182, 0.12);
+  --radio: 12px;
+  --transicion: 0.3s ease;
+}
+
+/* ---------- Reset y base ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  min-height: 100vh;
+}
+
+/* ---------- Navbar ---------- */
+.navbar-pethealth {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  box-shadow: var(--sombra);
+}
+
+.navbar-pethealth .navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white !important;
+  letter-spacing: 1px;
+}
+
+.navbar-pethealth .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  transition: color var(--transicion);
+}
+
+.navbar-pethealth .nav-link:hover,
+.navbar-pethealth .nav-link.active {
+  color: white !important;
+}
+
+/* ---------- Hero / Banner ---------- */
+.hero-section {
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
+  color: white;
+  padding: 80px 0 60px;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+/* ---------- Cards ---------- */
+.card-pethealth {
+  border: none;
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion), box-shadow var(--transicion);
+}
+
+.card-pethealth:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(46, 117, 182, 0.2);
+}
+
+.card-pethealth .card-header {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  color: white;
+  border-radius: var(--radio) var(--radio) 0 0 !important;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 1rem 1.25rem;
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* ---------- Botones ---------- */
+.btn-pethealth {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  transition: opacity var(--transicion), transform var(--transicion);
+}
+
+.btn-pethealth:hover {
+  opacity: 0.9;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-outline-pethealth {
+  border: 2px solid var(--color-primario);
+  color: var(--color-primario);
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  background: transparent;
+  transition: all var(--transicion);
+}
+
+.btn-outline-pethealth:hover {
+  background: var(--color-primario);
+  color: white;
+}
+
+/* ---------- Formularios ---------- */
+.form-pethealth .form-control,
+.form-pethealth .form-select {
+  border-radius: 8px;
+  border: 1.5px solid #CBD6E2;
+  padding: 0.65rem 1rem;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+
+.form-pethealth .form-control:focus,
+.form-pethealth .form-select:focus {
+  border-color: var(--color-primario);
+  box-shadow: 0 0 0 3px rgba(46, 117, 182, 0.15);
+  outline: none;
+}
+
+.form-pethealth label {
+  font-weight: 500;
+  color: var(--color-texto);
+  margin-bottom: 0.35rem;
+}
+
+/* ---------- Tabla de eventos ---------- */
+.tabla-eventos thead {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  color: white;
+}
+
+.tabla-eventos tbody tr:hover {
+  background-color: rgba(46, 117, 182, 0.06);
+}
+
+/* ---------- Badges de estado ---------- */
+.badge-ok {
+  background-color: #d4edda;
+  color: #155724;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.badge-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.badge-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ---------- Panel Admin ---------- */
+.sidebar {
+  background: linear-gradient(180deg, var(--color-secundario), var(--color-primario));
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  margin: 2px 10px;
+  font-weight: 500;
+  transition: all var(--transicion);
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.sidebar .nav-link .icono {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  background: var(--color-secundario);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+footer a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color var(--transicion);
+}
+
+footer a:hover {
+  color: white;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+  }
+
+  .sidebar {
+    min-height: auto;
+  }
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetHealth - Registro</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../CSS/styles.css" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-pethealth">
+    <div class="container">
+      <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
+      <div class="ms-auto">
+        <a class="nav-link text-white d-inline" href="login.html">← Iniciar sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+          <div class="card card-pethealth">
+            <div class="card-header text-center">
+              🐾 Crear Cuenta
+            </div>
+            <div class="card-body p-4">
+
+              <!-- Alerta dinámica -->
+              <div id="alertaRegistro"></div>
+
+              <form id="formRegistro" novalidate class="form-pethealth">
+
+                <div class="mb-3">
+                  <label for="regNombre" class="form-label">Nombre completo</label>
+                  <input type="text" class="form-control" id="regNombre" placeholder="Ingrese su nombre" />
+                  <div class="invalid-feedback">El nombre es obligatorio.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="regCorreo" class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="regCorreo" placeholder="ejemplo@correo.com" />
+                  <div class="invalid-feedback">Ingrese un correo válido.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="regContrasena" class="form-label">Contraseña</label>
+                  <input type="password" class="form-control" id="regContrasena" placeholder="Mínimo 6 caracteres" />
+                  <div class="invalid-feedback">Mínimo 6 caracteres.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="regConfirmar" class="form-label">Confirmar contraseña</label>
+                  <input type="password" class="form-control" id="regConfirmar" placeholder="Repita su contraseña" />
+                  <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+                </div>
+
+                <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="regTerminos" />
+                  <label class="form-check-label" for="regTerminos">
+                    Acepto los <a href="#" style="color: var(--color-primario);">términos y condiciones</a>
+                  </label>
+                </div>
+
+                <button type="button" class="btn btn-pethealth w-100" onclick="handleRegistro()">
+                  Crear mi cuenta
+                </button>
+
+              </form>
+
+              <hr />
+              <p class="text-center text-muted small mb-0">
+                ¿Ya tiene cuenta?
+                <a href="login.html" class="text-decoration-none fw-bold" style="color: var(--color-primario);">Inicie sesión</a>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container text-center">
+      <p class="small mb-0">🐾 PetHealth — Grupo 9 | SC-502 | Universidad Fidelitas</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../JS/utils.js"></script>
+  <script src="../JS/auth.js"></script>
+</body>
+</html>

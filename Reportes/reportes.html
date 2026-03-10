@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetHealth - Reportes</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../CSS/styles.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-pethealth">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="text-white small" id="nombreUsuario">👤</span>
+        <button class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- SIDEBAR -->
+      <div class="col-md-2 p-0">
+        <div class="sidebar d-flex flex-column pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="../PanelAdmin/dashboard.html"><span class="icono">🏠</span> Panel</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Mascotas/mascotas.html"><span class="icono">🐾</span> Mis Mascotas</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Eventos/eventos.html"><span class="icono">💉</span> Eventos de Salud</a></li>
+            <li class="nav-item"><a class="nav-link active" href="reportes.html"><span class="icono">📊</span> Reportes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Informacion/informacion.html"><span class="icono">ℹ️</span> Información</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Contacto/contacto.html"><span class="icono">📧</span> Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="col-md-10 p-4">
+        <h4 class="fw-bold mb-4" style="color: var(--color-primario);">📊 Reportes de Salud</h4>
+
+        <!-- Filtros -->
+        <div class="card card-pethealth mb-4">
+          <div class="card-header">🔍 Filtrar reportes</div>
+          <div class="card-body">
+            <div class="row g-3 form-pethealth">
+              <div class="col-md-4">
+                <label class="form-label">Mascota</label>
+                <select class="form-select" id="filtroMascota">
+                  <option value="">Todas las mascotas</option>
+                  <option value="Firulais">Firulais</option>
+                  <option value="Luna">Luna</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Tipo de evento</label>
+                <select class="form-select" id="filtroTipo">
+                  <option value="">Todos los tipos</option>
+                  <option value="Vacuna">Vacuna</option>
+                  <option value="Desparasitación">Desparasitación</option>
+                  <option value="Cita veterinaria">Cita veterinaria</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select class="form-select" id="filtroEstado">
+                  <option value="">Todos</option>
+                  <option value="ok">Al día</option>
+                  <option value="proximo">Próximo</option>
+                  <option value="vencido">Vencido</option>
+                </select>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-pethealth w-100" onclick="filtrarReportes()">Buscar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de resultados -->
+        <div class="card card-pethealth">
+          <div class="card-header">📋 Resultados</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table tabla-eventos mb-0">
+                <thead>
+                  <tr>
+                    <th>Mascota</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="tablaReportesBody">
+                  <tr>
+                    <td>Firulais</td><td>Vacuna</td><td>15/08/2025</td>
+                    <td>Vacuna antirrábica</td>
+                    <td><span class="badge-ok">✅ Al día</span></td>
+                  </tr>
+                  <tr>
+                    <td>Luna</td><td>Desparasitación</td><td>20/03/2025</td>
+                    <td>Tratamiento interno</td>
+                    <td><span class="badge-warning">⚠️ Próximo</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../JS/utils.js"></script>
+  <script>
+    let u = sessionStorage.getItem("usuario");
+    if (u) document.getElementById("nombreUsuario").textContent = "👤 " + u;
+
+    function filtrarReportes() {
+      // Se conectará con PHP/MySQL en la entrega final
+      mostrarAlerta("alertaReportes", "ℹ️ Filtros aplicados. (Función completa disponible en entrega final con PHP/MySQL)", "info");
+    }
+  </script>
+</body>
+</html>

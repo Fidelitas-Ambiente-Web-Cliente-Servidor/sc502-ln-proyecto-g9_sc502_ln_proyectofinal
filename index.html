@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetHealth - Inicio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="CSS/styles.css" />
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar navbar-expand-lg navbar-pethealth">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">🐾 PetHealth</a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto gap-1">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="Informacion/informacion.html">¿Cómo funciona?</a></li>
+          <li class="nav-item"><a class="nav-link" href="Contacto/contacto.html">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link" href="Auth/login.html">Iniciar sesión</a></li>
+          <li class="nav-item">
+            <a class="btn btn-light ms-2 fw-bold text-primary" href="Auth/registro.html">Registrarse</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero-section">
+    <div class="container">
+      <h1>🐾 Gestión de salud<br>para tus mascotas</h1>
+      <p>Lleva el control de vacunas, desparasitaciones y citas veterinarias en un solo lugar. Simple, organizado y siempre a mano.</p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="Auth/registro.html" class="btn btn-light btn-lg fw-bold text-primary px-4">Comenzar gratis</a>
+        <a href="Informacion/informacion.html" class="btn btn-outline-light btn-lg px-4">Ver cómo funciona</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FUNCIONALIDADES ========== -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="text-center fw-bold mb-2" style="color: var(--color-primario);">¿Qué puedes hacer con PetHealth?</h2>
+      <p class="text-center text-muted mb-5">Todo lo que necesitas para cuidar la salud de tu mascota</p>
+      <div class="row g-4">
+        <div class="col-md-3 col-sm-6">
+          <div class="card card-pethealth text-center p-4 h-100">
+            <span class="card-icon">💉</span>
+            <h5 class="fw-bold">Vacunas</h5>
+            <p class="text-muted small">Registra y controla todas las vacunas con fecha y tipo de dosis.</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="card card-pethealth text-center p-4 h-100">
+            <span class="card-icon">📅</span>
+            <h5 class="fw-bold">Citas</h5>
+            <p class="text-muted small">Agenda citas veterinarias y recibe recordatorios automáticos.</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="card card-pethealth text-center p-4 h-100">
+            <span class="card-icon">🔔</span>
+            <h5 class="fw-bold">Recordatorios</h5>
+            <p class="text-muted small">Alertas para eventos próximos y vencidos de salud.</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="card card-pethealth text-center p-4 h-100">
+            <span class="card-icon">📋</span>
+            <h5 class="fw-bold">Expediente</h5>
+            <p class="text-muted small">Historial completo de salud por mascota en un solo lugar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA ========== -->
+  <section class="py-5" style="background: linear-gradient(135deg, #EBF3FA, #D0E8F5);">
+    <div class="container text-center">
+      <h3 class="fw-bold mb-3">¿Listo para empezar?</h3>
+      <p class="text-muted mb-4">Crear tu cuenta es gratis. Registra tus mascotas y empieza a llevar su control de salud hoy mismo.</p>
+      <a href="Auth/registro.html" class="btn btn-pethealth btn-lg px-5">Crear mi cuenta</a>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <div class="container text-center">
+      <p class="mb-1">🐾 <strong>PetHealth</strong> — Proyecto SC-502 Ambiente Web Cliente Servidor</p>
+      <p class="small mb-0">Grupo 9 | Universidad Fidelitas | Fabian Mora C., Axel Segura A., Edmilson Flores S., Walter Chacón C.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

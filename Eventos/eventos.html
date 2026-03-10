@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetHealth - Eventos de Salud</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../CSS/styles.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-pethealth">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="text-white small" id="nombreUsuario">👤</span>
+        <button class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- SIDEBAR -->
+      <div class="col-md-2 p-0">
+        <div class="sidebar d-flex flex-column pt-3">
+          <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="../PanelAdmin/dashboard.html"><span class="icono">🏠</span> Panel</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Mascotas/mascotas.html"><span class="icono">🐾</span> Mis Mascotas</a></li>
+            <li class="nav-item"><a class="nav-link active" href="eventos.html"><span class="icono">💉</span> Eventos de Salud</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Reportes/reportes.html"><span class="icono">📊</span> Reportes</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Informacion/informacion.html"><span class="icono">ℹ️</span> Información</a></li>
+            <li class="nav-item"><a class="nav-link" href="../Contacto/contacto.html"><span class="icono">📧</span> Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="col-md-10 p-4">
+        <h4 class="fw-bold mb-4" style="color: var(--color-primario);">💉 Eventos de Salud</h4>
+
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#panelListaEventos">📋 Historial</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#panelNuevoEvento">➕ Nuevo evento</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Lista de eventos -->
+          <div class="tab-pane fade show active" id="panelListaEventos">
+            <div class="card card-pethealth">
+              <div class="card-header">📋 Historial de eventos de salud</div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table tabla-eventos mb-0">
+                    <thead>
+                      <tr>
+                        <th>Mascota</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaEventosBody">
+                      <!-- JS carga filas -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nuevo evento -->
+          <div class="tab-pane fade" id="panelNuevoEvento">
+            <div class="row justify-content-center">
+              <div class="col-md-7">
+                <div class="card card-pethealth">
+                  <div class="card-header">➕ Registrar Evento de Salud</div>
+                  <div class="card-body p-4">
+                    <div id="alertaEvento"></div>
+                    <form id="formEvento" novalidate class="form-pethealth">
+
+                      <div class="mb-3">
+                        <label for="evMascota" class="form-label">Mascota</label>
+                        <select class="form-select" id="evMascota">
+                          <option value="">-- Seleccione --</option>
+                          <option value="Firulais">Firulais 🐶</option>
+                          <option value="Luna">Luna 🐱</option>
+                        </select>
+                        <div class="invalid-feedback">Seleccione una mascota.</div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="evTipo" class="form-label">Tipo de evento</label>
+                        <select class="form-select" id="evTipo">
+                          <option value="">-- Seleccione --</option>
+                          <option value="Vacuna">💉 Vacuna</option>
+                          <option value="Desparasitación">🪱 Desparasitación</option>
+                          <option value="Cita veterinaria">🏥 Cita veterinaria</option>
+                          <option value="Revisión general">🩺 Revisión general</option>
+                        </select>
+                        <div class="invalid-feedback">Seleccione el tipo de evento.</div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="evFecha" class="form-label">Fecha del evento</label>
+                        <input type="date" class="form-control" id="evFecha" />
+                        <div class="invalid-feedback">La fecha es obligatoria.</div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="evDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="evDescripcion" rows="3" placeholder="Detalle del evento..."></textarea>
+                        <div class="invalid-feedback">La descripción es obligatoria.</div>
+                      </div>
+
+                      <button type="button" class="btn btn-pethealth w-100" onclick="agregarEvento()">
+                        Registrar evento
+                      </button>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../JS/utils.js"></script>
+  <script src="../JS/eventos.js"></script>
+  <script>
+    let u = sessionStorage.getItem("usuario");
+    if (u) document.getElementById("nombreUsuario").textContent = "👤 " + u;
+    cargarEventos();
+  </script>
+</body>
+</html>

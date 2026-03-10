@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetHealth - Contacto</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../CSS/styles.css" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-pethealth">
+    <div class="container">
+      <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="../index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../Informacion/informacion.html">¿Cómo funciona?</a></li>
+          <li class="nav-item"><a class="nav-link active" href="contacto.html">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link" href="../Auth/login.html">Iniciar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero-section py-5">
+    <div class="container text-center">
+      <h2 class="fw-bold">📧 Contáctenos</h2>
+      <p>¿Tienes dudas o sugerencias? Escríbenos y te responderemos a la brevedad.</p>
+    </div>
+  </section>
+
+  <!-- FORMULARIO DE CONTACTO -->
+  <main class="flex-grow-1 py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div class="card card-pethealth">
+            <div class="card-header">📧 Formulario de contacto</div>
+            <div class="card-body p-4">
+              <div id="alertaContacto"></div>
+              <form id="formContacto" novalidate class="form-pethealth">
+
+                <div class="mb-3">
+                  <label for="ctNombre" class="form-label">Nombre completo</label>
+                  <input type="text" class="form-control" id="ctNombre" placeholder="Su nombre" />
+                  <div class="invalid-feedback">El nombre es obligatorio.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="ctCorreo" class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="ctCorreo" placeholder="ejemplo@correo.com" />
+                  <div class="invalid-feedback">Ingrese un correo válido.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="ctAsunto" class="form-label">Asunto</label>
+                  <select class="form-select" id="ctAsunto">
+                    <option value="">-- Seleccione --</option>
+                    <option value="Consulta general">Consulta general</option>
+                    <option value="Soporte técnico">Soporte técnico</option>
+                    <option value="Sugerencia">Sugerencia</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <div class="invalid-feedback">Seleccione un asunto.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="ctMensaje" class="form-label">Mensaje</label>
+                  <textarea class="form-control" id="ctMensaje" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
+                  <div class="invalid-feedback">El mensaje es obligatorio.</div>
+                </div>
+
+                <button type="button" class="btn btn-pethealth w-100" onclick="enviarContacto()">
+                  Enviar mensaje
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container text-center">
+      <p class="small mb-0">🐾 PetHealth — Grupo 9 | SC-502 | Universidad Fidelitas</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../JS/utils.js"></script>
+  <script>
+    function enviarContacto() {
+      let nombre = document.getElementById("ctNombre").value;
+      let correo = document.getElementById("ctCorreo").value;
+      let asunto = document.getElementById("ctAsunto").value;
+      let mensaje = document.getElementById("ctMensaje").value;
+      let valido = true;
+
+      limpiarFormulario("formContacto");
+
+      if (!campoRequerido(nombre)) { mostrarError("ctNombre", "El nombre es obligatorio."); valido = false; }
+      else { limpiarError("ctNombre"); }
+
+      if (!validarCorreo(correo)) { mostrarError("ctCorreo", "Ingrese un correo válido."); valido = false; }
+      else { limpiarError("ctCorreo"); }
+
+      if (!campoRequerido(asunto)) { mostrarError("ctAsunto", "Seleccione un asunto."); valido = false; }
+      else { limpiarError("ctAsunto"); }
+
+      if (!campoRequerido(mensaje)) { mostrarError("ctMensaje", "El mensaje es obligatorio."); valido = false; }
+      else { limpiarError("ctMensaje"); }
+
+      if (valido) {
+        mostrarAlerta("alertaContacto", "✅ Mensaje enviado correctamente. Gracias por contactarnos.", "success");
+        document.getElementById("formContacto").reset();
+        limpiarFormulario("formContacto");
+      }
+    }
+  </script>
+</body>
+</html>
