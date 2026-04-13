@@ -1,12 +1,18 @@
 <?php
+// ============================================================
+//  PetHealth – Configuración de base de datos
+//  Edite solo este archivo para cambiar las credenciales.
+// ============================================================
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');          
-define('DB_PASS', '');              
+define('DB_USER', 'root');          // Cambie al usuario de su servidor
+define('DB_PASS', '');              // Contraseña de MySQL
 define('DB_NAME', 'pethealth');
 define('DB_CHARSET', 'utf8mb4');
 
-
+/**
+ * Devuelve una conexión PDO singleton.
+ */
 function getDB(): PDO {
     static $pdo = null;
     if ($pdo === null) {
