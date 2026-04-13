@@ -9,70 +9,48 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-pethealth">
     <div class="container">
       <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
-      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="../index.html">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="../Informacion/informacion.html">¿Cómo funciona?</a></li>
-          <li class="nav-item"><a class="nav-link active" href="contacto.html">Contacto</a></li>
-          <li class="nav-item"><a class="nav-link" href="../Auth/login.html">Iniciar sesión</a></li>
-        </ul>
+      <div class="ms-auto">
+        <a class="nav-link text-white d-inline" href="../index.html">← Inicio</a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero-section py-5">
-    <div class="container text-center">
-      <h2 class="fw-bold">📧 Contáctenos</h2>
-      <p>¿Tienes dudas o sugerencias? Escríbenos y te responderemos a la brevedad.</p>
-    </div>
-  </section>
-
-  <!-- FORMULARIO DE CONTACTO -->
   <main class="flex-grow-1 py-5">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-7">
+          <h3 class="fw-bold mb-4 text-center" style="color: var(--color-primario);">📧 Contacto</h3>
+
           <div class="card card-pethealth">
-            <div class="card-header">📧 Formulario de contacto</div>
+            <div class="card-header text-center">Envíanos un mensaje</div>
             <div class="card-body p-4">
               <div id="alertaContacto"></div>
               <form id="formContacto" novalidate class="form-pethealth">
 
                 <div class="mb-3">
-                  <label for="ctNombre" class="form-label">Nombre completo</label>
-                  <input type="text" class="form-control" id="ctNombre" placeholder="Su nombre" />
+                  <label for="cNombre" class="form-label">Nombre completo</label>
+                  <input type="text" class="form-control" id="cNombre" placeholder="Tu nombre" />
                   <div class="invalid-feedback">El nombre es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="ctCorreo" class="form-label">Correo electrónico</label>
-                  <input type="email" class="form-control" id="ctCorreo" placeholder="ejemplo@correo.com" />
+                  <label for="cCorreo" class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="cCorreo" placeholder="ejemplo@correo.com" />
                   <div class="invalid-feedback">Ingrese un correo válido.</div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="ctAsunto" class="form-label">Asunto</label>
-                  <select class="form-select" id="ctAsunto">
-                    <option value="">-- Seleccione --</option>
-                    <option value="Consulta general">Consulta general</option>
-                    <option value="Soporte técnico">Soporte técnico</option>
-                    <option value="Sugerencia">Sugerencia</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  <div class="invalid-feedback">Seleccione un asunto.</div>
+                  <label for="cAsunto" class="form-label">Asunto</label>
+                  <input type="text" class="form-control" id="cAsunto" placeholder="Motivo del mensaje" />
+                  <div class="invalid-feedback">El asunto es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                  <label for="ctMensaje" class="form-label">Mensaje</label>
-                  <textarea class="form-control" id="ctMensaje" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
+                  <label for="cMensaje" class="form-label">Mensaje</label>
+                  <textarea class="form-control" id="cMensaje" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
                   <div class="invalid-feedback">El mensaje es obligatorio.</div>
                 </div>
 
@@ -82,12 +60,36 @@
               </form>
             </div>
           </div>
+
+          <div class="row mt-4 g-3">
+            <div class="col-md-4 text-center">
+              <div class="card card-pethealth p-3">
+                <span style="font-size:2rem">📧</span>
+                <p class="mb-0 small fw-bold">Email</p>
+                <p class="text-muted small mb-0">info@pethealth.com</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="card card-pethealth p-3">
+                <span style="font-size:2rem">📍</span>
+                <p class="mb-0 small fw-bold">Ubicación</p>
+                <p class="text-muted small mb-0">San José, Costa Rica</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="card card-pethealth p-3">
+                <span style="font-size:2rem">🕐</span>
+                <p class="mb-0 small fw-bold">Horario</p>
+                <p class="text-muted small mb-0">Lun–Vie 8am–5pm</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div class="container text-center">
       <p class="small mb-0">🐾 PetHealth — Grupo 9 | SC-502 | Universidad Fidelitas</p>
@@ -97,31 +99,43 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../JS/utils.js"></script>
   <script>
-    function enviarContacto() {
-      let nombre = document.getElementById("ctNombre").value;
-      let correo = document.getElementById("ctCorreo").value;
-      let asunto = document.getElementById("ctAsunto").value;
-      let mensaje = document.getElementById("ctMensaje").value;
-      let valido = true;
+    async function enviarContacto() {
+      let nombre  = document.getElementById('cNombre').value.trim();
+      let correo  = document.getElementById('cCorreo').value.trim();
+      let asunto  = document.getElementById('cAsunto').value.trim();
+      let mensaje = document.getElementById('cMensaje').value.trim();
+      let valido  = true;
 
-      limpiarFormulario("formContacto");
+      limpiarFormulario('formContacto');
 
-      if (!campoRequerido(nombre)) { mostrarError("ctNombre", "El nombre es obligatorio."); valido = false; }
-      else { limpiarError("ctNombre"); }
+      if (!campoRequerido(nombre))  { mostrarError('cNombre',  'El nombre es obligatorio.');   valido = false; }
+      if (!campoRequerido(correo))  { mostrarError('cCorreo',  'El correo es obligatorio.');   valido = false; }
+      else if (!validarCorreo(correo)) { mostrarError('cCorreo', 'Ingrese un correo válido.'); valido = false; }
+      if (!campoRequerido(asunto))  { mostrarError('cAsunto',  'El asunto es obligatorio.');   valido = false; }
+      if (!campoRequerido(mensaje)) { mostrarError('cMensaje', 'El mensaje es obligatorio.');  valido = false; }
+      if (!valido) return;
 
-      if (!validarCorreo(correo)) { mostrarError("ctCorreo", "Ingrese un correo válido."); valido = false; }
-      else { limpiarError("ctCorreo"); }
+      let btn = document.querySelector('#formContacto button');
+      if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
 
-      if (!campoRequerido(asunto)) { mostrarError("ctAsunto", "Seleccione un asunto."); valido = false; }
-      else { limpiarError("ctAsunto"); }
-
-      if (!campoRequerido(mensaje)) { mostrarError("ctMensaje", "El mensaje es obligatorio."); valido = false; }
-      else { limpiarError("ctMensaje"); }
-
-      if (valido) {
-        mostrarAlerta("alertaContacto", "✅ Mensaje enviado correctamente. Gracias por contactarnos.", "success");
-        document.getElementById("formContacto").reset();
-        limpiarFormulario("formContacto");
+      try {
+        const resp = await fetch('../API/contacto.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, correo, asunto, mensaje }),
+          credentials: 'same-origin'
+        });
+        const data = await resp.json();
+        if (data.exito) {
+          mostrarAlerta('alertaContacto', '✅ ' + data.mensaje, 'success');
+          document.getElementById('formContacto').reset();
+        } else {
+          mostrarAlerta('alertaContacto', '❌ ' + data.mensaje, 'danger');
+        }
+      } catch (err) {
+        mostrarAlerta('alertaContacto', '⚠️ Error de conexión con el servidor.', 'warning');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Enviar mensaje'; }
       }
     }
   </script>

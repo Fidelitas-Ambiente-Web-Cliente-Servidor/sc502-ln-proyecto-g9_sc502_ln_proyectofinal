@@ -9,7 +9,6 @@
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-pethealth">
     <div class="container-fluid">
       <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
@@ -22,7 +21,6 @@
 
   <div class="container-fluid">
     <div class="row">
-      <!-- SIDEBAR -->
       <div class="col-md-2 p-0">
         <div class="sidebar d-flex flex-column pt-3">
           <ul class="nav flex-column">
@@ -36,7 +34,6 @@
         </div>
       </div>
 
-      <!-- CONTENIDO -->
       <div class="col-md-10 p-4">
         <h4 class="fw-bold mb-4" style="color: var(--color-primario);">💉 Eventos de Salud</h4>
 
@@ -50,7 +47,7 @@
         </ul>
 
         <div class="tab-content">
-          <!-- Lista de eventos -->
+          <!-- Lista -->
           <div class="tab-pane fade show active" id="panelListaEventos">
             <div class="card card-pethealth">
               <div class="card-header">📋 Historial de eventos de salud</div>
@@ -59,16 +56,10 @@
                   <table class="table tabla-eventos mb-0">
                     <thead>
                       <tr>
-                        <th>Mascota</th>
-                        <th>Tipo</th>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Estado</th>
+                        <th>Mascota</th><th>Tipo</th><th>Fecha</th><th>Descripción</th><th>Estado</th><th>Acción</th>
                       </tr>
                     </thead>
-                    <tbody id="tablaEventosBody">
-                      <!-- JS carga filas -->
-                    </tbody>
+                    <tbody id="tablaEventosBody"></tbody>
                   </table>
                 </div>
               </div>
@@ -88,9 +79,7 @@
                       <div class="mb-3">
                         <label for="evMascota" class="form-label">Mascota</label>
                         <select class="form-select" id="evMascota">
-                          <option value="">-- Seleccione --</option>
-                          <option value="Firulais">Firulais 🐶</option>
-                          <option value="Luna">Luna 🐱</option>
+                          <option value="">-- Cargando mascotas... --</option>
                         </select>
                         <div class="invalid-feedback">Seleccione una mascota.</div>
                       </div>
@@ -122,7 +111,6 @@
                       <button type="button" class="btn btn-pethealth w-100" onclick="agregarEvento()">
                         Registrar evento
                       </button>
-
                     </form>
                   </div>
                 </div>
@@ -136,11 +124,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../JS/utils.js"></script>
+  <script src="../JS/auth.js"></script>
   <script src="../JS/eventos.js"></script>
-  <script>
-    let u = sessionStorage.getItem("usuario");
-    if (u) document.getElementById("nombreUsuario").textContent = "👤 " + u;
-    cargarEventos();
-  </script>
 </body>
 </html>

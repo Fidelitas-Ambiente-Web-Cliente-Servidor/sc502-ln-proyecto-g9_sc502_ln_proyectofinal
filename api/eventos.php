@@ -1,123 +1,149 @@
 <?php
 // ============================================================
-//  PetHealth – API Eventos
-//  Rutas:
-//    GET    /api/eventos.php              → listar eventos del usuario
-//    POST   /api/eventos.php              → crear evento
-//    PUT    /api/eventos.php?id={n}       → actualizar evento
-//    DELETE /api/eventos.php?id={n}       → eliminar evento
+// PetHealth - API: Eventos de Salud (CRUD)
+// GET    /API/eventos.php                     -> listar eventos del usuario
+// GET    /API/eventos.php?mascota_id={id}     -> eventos de una mascota específica
+// POST   /API/eventos.php                     -> crear evento
+// DELETE /API/eventos.php?id={id}             -> eliminar evento
 // ============================================================
+require_once 'config.php';
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../config/helpers.php';
+if (!isset($_SESSION['usuario_id'])) {
+    http_response_code(401);
+    echo json_encode(['exito' => false, 'mensaje' => 'No autenticado']);
+    exit;
+}
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
+$usuario_id = (int) $_SESSION['usuario_id'];
+$metodo     = $_SERVER['REQUEST_METHOD'];
+$conn       = getConexion();
 
-$usuario = requerirSesion();
-$pdo     = getDB();
-$metodo  = $_SERVER['REQUEST_METHOD'];
-$id      = isset($_GET['id']) ? (int)$_GET['id'] : null;
-
-/**
- * Calcula el estado de un evento según su fecha.
- */
+// Función para calcular estado según fecha
 function calcularEstado(string $fecha): string {
-    $hoy      = new DateTime('today');
-    $objetivo = new DateTime($fecha);
-    $diff     = (int)$hoy->diff($objetivo)->days;
-    $futuro   = $objetivo >= $hoy;
+    $hoy   = new DateTime('today');
+    $evento = new DateTime($fecha);
+    $diff   = $hoy->diff($evento)->days;
+    $futuro = $evento >= $hoy;
 
-    if (!$futuro)       return 'vencido';
-    if ($diff <= 30)    return 'proximo';
+    if (!$futuro) return 'vencido';
+    if ($diff <= 30) return 'proximo';
     return 'ok';
 }
 
-// ── GET – Listar eventos ─────────────────────────────────────
+// ── GET: Listar eventos ──────────────────────────────────────
 if ($metodo === 'GET') {
-    $stmt = $pdo->prepare(
-        'SELECT e.id, m.nombre AS mascota, e.mascota_id, e.tipo, e.fecha, e.descripcion, e.estado
-           FROM eventos e
-           JOIN mascotas m ON m.id = e.mascota_id
-          WHERE e.usuario_id = ?
-          ORDER BY e.fecha DESC'
-    );
-    $stmt->execute([$usuario['id']]);
-    responder(['ok' => true, 'eventos' => $stmt->fetchAll()]);
+    $mascota_id = isset($_GET['mascota_id']) ? (int)$_GET['mascota_id'] : 0;
+
+    if ($mascota_id > 0) {
+        // Eventos de una mascota específica (verificar que pertenece al usuario)
+        $stmt = $conn->prepare(
+            'SELECT e.id, e.mascota_id, m.nombre AS mascota_nombre, e.tipo, e.fecha,
+                    e.descripcion, e.estado, e.created_at
+             FROM eventos_salud e
+             INNER JOIN mascotas m ON m.id = e.mascota_id
+             WHERE e.mascota_id = ? AND m.usuario_id = ?
+             ORDER BY e.fecha DESC'
+        );
+        $stmt->bind_param('ii', $mascota_id, $usuario_id);
+    } else {
+        // Todos los eventos del usuario
+        $stmt = $conn->prepare(
+            'SELECT e.id, e.mascota_id, m.nombre AS mascota_nombre, e.tipo, e.fecha,
+                    e.descripcion, e.estado, e.created_at
+             FROM eventos_salud e
+             INNER JOIN mascotas m ON m.id = e.mascota_id
+             WHERE m.usuario_id = ?
+             ORDER BY e.fecha DESC'
+        );
+        $stmt->bind_param('i', $usuario_id);
+    }
+
+    $stmt->execute();
+    $result  = $stmt->get_result();
+    $eventos = [];
+    while ($row = $result->fetch_assoc()) {
+        // Recalcular estado en tiempo real
+        $row['estado'] = calcularEstado($row['fecha']);
+        $eventos[] = $row;
+    }
+    $stmt->close();
+    $conn->close();
+
+    echo json_encode(['exito' => true, 'eventos' => $eventos]);
+    exit;
 }
 
-// ── POST – Crear evento ──────────────────────────────────────
+// ── POST: Crear evento ───────────────────────────────────────
 if ($metodo === 'POST') {
-    $d          = leerJSON();
-    $mascota_id = isset($d['mascota_id']) ? (int)$d['mascota_id'] : 0;
-    $tipo       = trim($d['tipo']        ?? '');
-    $fecha      = trim($d['fecha']       ?? '');
-    $descripcion = trim($d['descripcion'] ?? '');
+    $datos      = json_decode(file_get_contents('php://input'), true);
+    $mascota_id = (int)  ($datos['mascota_id'] ?? 0);
+    $tipo       = trim($datos['tipo']          ?? '');
+    $fecha      = trim($datos['fecha']         ?? '');
+    $desc       = trim($datos['descripcion']   ?? '');
 
-    if (!$mascota_id || !$tipo || !$fecha) {
-        responder(['ok' => false, 'mensaje' => 'mascota_id, tipo y fecha son obligatorios.'], 400);
+    if ($mascota_id <= 0 || empty($tipo) || empty($fecha) || empty($desc)) {
+        echo json_encode(['exito' => false, 'mensaje' => 'Todos los campos son obligatorios']);
+        exit;
     }
 
     // Verificar que la mascota pertenece al usuario
-    $chk = $pdo->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
-    $chk->execute([$mascota_id, $usuario['id']]);
-    if (!$chk->fetch()) {
-        responder(['ok' => false, 'mensaje' => 'Mascota no encontrada.'], 404);
+    $check = $conn->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
+    $check->bind_param('ii', $mascota_id, $usuario_id);
+    $check->execute();
+    $check->store_result();
+    if ($check->num_rows === 0) {
+        $check->close(); $conn->close();
+        echo json_encode(['exito' => false, 'mensaje' => 'Mascota no válida']);
+        exit;
     }
+    $check->close();
 
     $estado = calcularEstado($fecha);
-    $stmt   = $pdo->prepare(
-        'INSERT INTO eventos (mascota_id, usuario_id, tipo, fecha, descripcion, estado)
-         VALUES (?, ?, ?, ?, ?, ?)'
+
+    $stmt = $conn->prepare(
+        'INSERT INTO eventos_salud (mascota_id, tipo, fecha, descripcion, estado) VALUES (?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$mascota_id, $usuario['id'], $tipo, $fecha, $descripcion, $estado]);
+    $stmt->bind_param('issss', $mascota_id, $tipo, $fecha, $desc, $estado);
 
-    responder([
-        'ok'      => true,
-        'mensaje' => 'Evento registrado.',
-        'id'      => (int)$pdo->lastInsertId(),
-        'estado'  => $estado,
-    ], 201);
+    if ($stmt->execute()) {
+        $nuevo_id = $conn->insert_id;
+        $stmt->close(); $conn->close();
+        echo json_encode([
+            'exito'   => true,
+            'mensaje' => 'Evento registrado correctamente',
+            'id'      => $nuevo_id,
+            'estado'  => $estado
+        ]);
+    } else {
+        echo json_encode(['exito' => false, 'mensaje' => 'Error al registrar evento: ' . $conn->error]);
+    }
+    exit;
 }
 
-// ── PUT – Actualizar evento ──────────────────────────────────
-if ($metodo === 'PUT' && $id) {
-    $chk = $pdo->prepare('SELECT id FROM eventos WHERE id = ? AND usuario_id = ?');
-    $chk->execute([$id, $usuario['id']]);
-    if (!$chk->fetch()) {
-        responder(['ok' => false, 'mensaje' => 'Evento no encontrado.'], 404);
+// ── DELETE: Eliminar evento ──────────────────────────────────
+if ($metodo === 'DELETE') {
+    $id = (int)($_GET['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['exito' => false, 'mensaje' => 'ID inválido']);
+        exit;
     }
 
-    $d           = leerJSON();
-    $mascota_id  = isset($d['mascota_id']) ? (int)$d['mascota_id'] : 0;
-    $tipo        = trim($d['tipo']         ?? '');
-    $fecha       = trim($d['fecha']        ?? '');
-    $descripcion = trim($d['descripcion']  ?? '');
-
-    if (!$mascota_id || !$tipo || !$fecha) {
-        responder(['ok' => false, 'mensaje' => 'Todos los campos son obligatorios.'], 400);
-    }
-
-    $estado = calcularEstado($fecha);
-    $stmt   = $pdo->prepare(
-        'UPDATE eventos
-            SET mascota_id = ?, tipo = ?, fecha = ?, descripcion = ?, estado = ?
-          WHERE id = ? AND usuario_id = ?'
+    // Verificar propiedad via JOIN
+    $stmt = $conn->prepare(
+        'DELETE e FROM eventos_salud e
+         INNER JOIN mascotas m ON m.id = e.mascota_id
+         WHERE e.id = ? AND m.usuario_id = ?'
     );
-    $stmt->execute([$mascota_id, $tipo, $fecha, $descripcion, $estado, $id, $usuario['id']]);
-    responder(['ok' => true, 'mensaje' => 'Evento actualizado.', 'estado' => $estado]);
-}
+    $stmt->bind_param('ii', $id, $usuario_id);
 
-// ── DELETE – Eliminar evento ─────────────────────────────────
-if ($metodo === 'DELETE' && $id) {
-    $stmt = $pdo->prepare('DELETE FROM eventos WHERE id = ? AND usuario_id = ?');
-    $stmt->execute([$id, $usuario['id']]);
-    if ($stmt->rowCount() === 0) {
-        responder(['ok' => false, 'mensaje' => 'Evento no encontrado.'], 404);
+    if ($stmt->execute() && $stmt->affected_rows > 0) {
+        $stmt->close(); $conn->close();
+        echo json_encode(['exito' => true, 'mensaje' => 'Evento eliminado correctamente']);
+    } else {
+        echo json_encode(['exito' => false, 'mensaje' => 'No se pudo eliminar el evento']);
     }
-    responder(['ok' => true, 'mensaje' => 'Evento eliminado.']);
+    exit;
 }
 
-responder(['ok' => false, 'mensaje' => 'Método no permitido.'], 405);
+echo json_encode(['exito' => false, 'mensaje' => 'Método no soportado']);
+$conn->close();

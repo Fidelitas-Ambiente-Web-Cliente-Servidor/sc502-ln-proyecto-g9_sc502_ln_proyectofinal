@@ -1,107 +1,156 @@
 <?php
 // ============================================================
-//  PetHealth – API Mascotas
-//  Rutas:
-//    GET    /api/mascotas.php              → listar mis mascotas
-//    POST   /api/mascotas.php              → crear mascota
-//    PUT    /api/mascotas.php?id={n}       → actualizar mascota
-//    DELETE /api/mascotas.php?id={n}       → eliminar mascota
+// PetHealth - API: Mascotas (CRUD)
+// GET    /API/mascotas.php               -> listar mascotas del usuario
+// POST   /API/mascotas.php               -> crear mascota
+// PUT    /API/mascotas.php?id={id}       -> actualizar mascota
+// DELETE /API/mascotas.php?id={id}       -> eliminar mascota
 // ============================================================
+require_once 'config.php';
 
-require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../config/helpers.php';
-
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
-
-$usuario = requerirSesion();
-$pdo     = getDB();
-$metodo  = $_SERVER['REQUEST_METHOD'];
-$id      = isset($_GET['id']) ? (int)$_GET['id'] : null;
-
-// ── GET – Listar mascotas del usuario ────────────────────────
-if ($metodo === 'GET') {
-    $stmt = $pdo->prepare(
-        'SELECT id, nombre, especie, raza, edad, peso, observaciones
-           FROM mascotas
-          WHERE usuario_id = ?
-          ORDER BY nombre'
-    );
-    $stmt->execute([$usuario['id']]);
-    responder(['ok' => true, 'mascotas' => $stmt->fetchAll()]);
+// Verificar autenticación
+if (!isset($_SESSION['usuario_id'])) {
+    http_response_code(401);
+    echo json_encode(['exito' => false, 'mensaje' => 'No autenticado. Inicie sesión primero.']);
+    exit;
 }
 
-// ── POST – Crear mascota ─────────────────────────────────────
+$usuario_id = (int) $_SESSION['usuario_id'];
+$metodo     = $_SERVER['REQUEST_METHOD'];
+$conn       = getConexion();
+
+// ── GET: Listar mascotas ──────────────────────────────────────
+if ($metodo === 'GET') {
+    $stmt = $conn->prepare(
+        'SELECT id, nombre, especie, raza, edad, peso, observaciones, created_at
+         FROM mascotas
+         WHERE usuario_id = ?
+         ORDER BY nombre ASC'
+    );
+    $stmt->bind_param('i', $usuario_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $mascotas = [];
+    while ($row = $result->fetch_assoc()) {
+        $mascotas[] = $row;
+    }
+    $stmt->close();
+    $conn->close();
+
+    echo json_encode(['exito' => true, 'mascotas' => $mascotas]);
+    exit;
+}
+
+// ── POST: Crear mascota ──────────────────────────────────────
 if ($metodo === 'POST') {
-    $d = leerJSON();
-    $nombre       = trim($d['nombre']       ?? '');
-    $especie      = trim($d['especie']      ?? '');
-    $raza         = trim($d['raza']         ?? '');
-    $edad         = isset($d['edad'])        ? (int)$d['edad']         : null;
-    $peso         = isset($d['peso'])        ? (float)$d['peso']       : null;
-    $observaciones = trim($d['observaciones'] ?? 'Sin observaciones');
+    $datos  = json_decode(file_get_contents('php://input'), true);
+    $nombre = trim($datos['nombre']       ?? '');
+    $especie = trim($datos['especie']     ?? '');
+    $raza   = trim($datos['raza']         ?? '');
+    $edad   = (int)  ($datos['edad']      ?? 0);
+    $peso   = (float)($datos['peso']      ?? 0.0);
+    $obs    = trim($datos['observaciones'] ?? '');
 
-    if (!$nombre || !$especie || !$raza || $edad === null || $peso === null) {
-        responder(['ok' => false, 'mensaje' => 'Todos los campos son obligatorios.'], 400);
+    if (empty($nombre) || empty($especie) || empty($raza)) {
+        echo json_encode(['exito' => false, 'mensaje' => 'Nombre, especie y raza son obligatorios']);
+        exit;
     }
+
+    $especies_validas = ['Perro', 'Gato', 'Ave', 'Reptil', 'Otro'];
+    if (!in_array($especie, $especies_validas)) {
+        echo json_encode(['exito' => false, 'mensaje' => 'Especie no válida']);
+        exit;
+    }
+
     if ($edad < 0 || $peso <= 0) {
-        responder(['ok' => false, 'mensaje' => 'Edad o peso inválidos.'], 400);
+        echo json_encode(['exito' => false, 'mensaje' => 'Edad y peso deben ser valores positivos']);
+        exit;
     }
 
-    $stmt = $pdo->prepare(
+    $stmt = $conn->prepare(
         'INSERT INTO mascotas (usuario_id, nombre, especie, raza, edad, peso, observaciones)
          VALUES (?, ?, ?, ?, ?, ?, ?)'
     );
-    $stmt->execute([$usuario['id'], $nombre, $especie, $raza, $edad, $peso, $observaciones]);
-    $nuevoId = (int)$pdo->lastInsertId();
+    $stmt->bind_param('isssiis', $usuario_id, $nombre, $especie, $raza, $edad, $peso, $obs);
 
-    responder([
-        'ok'      => true,
-        'mensaje' => "Mascota $nombre registrada.",
-        'id'      => $nuevoId,
-    ], 201);
+    if ($stmt->execute()) {
+        $nueva_id = $conn->insert_id;
+        $stmt->close();
+        $conn->close();
+        echo json_encode([
+            'exito'   => true,
+            'mensaje' => "Mascota '$nombre' registrada exitosamente",
+            'id'      => $nueva_id
+        ]);
+    } else {
+        echo json_encode(['exito' => false, 'mensaje' => 'Error al registrar: ' . $conn->error]);
+    }
+    exit;
 }
 
-// ── PUT – Actualizar mascota ─────────────────────────────────
-if ($metodo === 'PUT' && $id) {
+// ── PUT: Actualizar mascota ──────────────────────────────────
+if ($metodo === 'PUT') {
+    $id = (int)($_GET['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['exito' => false, 'mensaje' => 'ID de mascota inválido']);
+        exit;
+    }
+
     // Verificar que la mascota pertenece al usuario
-    $check = $pdo->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
-    $check->execute([$id, $usuario['id']]);
-    if (!$check->fetch()) {
-        responder(['ok' => false, 'mensaje' => 'Mascota no encontrada.'], 404);
+    $check = $conn->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
+    $check->bind_param('ii', $id, $usuario_id);
+    $check->execute();
+    $check->store_result();
+    if ($check->num_rows === 0) {
+        $check->close(); $conn->close();
+        echo json_encode(['exito' => false, 'mensaje' => 'Mascota no encontrada']);
+        exit;
     }
+    $check->close();
 
-    $d = leerJSON();
-    $nombre        = trim($d['nombre']        ?? '');
-    $especie       = trim($d['especie']       ?? '');
-    $raza          = trim($d['raza']          ?? '');
-    $edad          = isset($d['edad'])         ? (int)$d['edad']   : null;
-    $peso          = isset($d['peso'])         ? (float)$d['peso'] : null;
-    $observaciones = trim($d['observaciones'] ?? '');
+    $datos   = json_decode(file_get_contents('php://input'), true);
+    $nombre  = trim($datos['nombre']       ?? '');
+    $especie = trim($datos['especie']      ?? '');
+    $raza    = trim($datos['raza']         ?? '');
+    $edad    = (int)  ($datos['edad']      ?? 0);
+    $peso    = (float)($datos['peso']      ?? 0.0);
+    $obs     = trim($datos['observaciones'] ?? '');
 
-    if (!$nombre || !$especie || !$raza || $edad === null || $peso === null) {
-        responder(['ok' => false, 'mensaje' => 'Todos los campos son obligatorios.'], 400);
-    }
-
-    $stmt = $pdo->prepare(
-        'UPDATE mascotas
-            SET nombre = ?, especie = ?, raza = ?, edad = ?, peso = ?, observaciones = ?
-          WHERE id = ? AND usuario_id = ?'
+    $stmt = $conn->prepare(
+        'UPDATE mascotas SET nombre=?, especie=?, raza=?, edad=?, peso=?, observaciones=?
+         WHERE id=? AND usuario_id=?'
     );
-    $stmt->execute([$nombre, $especie, $raza, $edad, $peso, $observaciones, $id, $usuario['id']]);
-    responder(['ok' => true, 'mensaje' => 'Mascota actualizada.']);
-}
+    $stmt->bind_param('sssiids', $nombre, $especie, $raza, $edad, $peso, $obs, $id, $usuario_id);
 
-// ── DELETE – Eliminar mascota ────────────────────────────────
-if ($metodo === 'DELETE' && $id) {
-    $stmt = $pdo->prepare('DELETE FROM mascotas WHERE id = ? AND usuario_id = ?');
-    $stmt->execute([$id, $usuario['id']]);
-    if ($stmt->rowCount() === 0) {
-        responder(['ok' => false, 'mensaje' => 'Mascota no encontrada.'], 404);
+    if ($stmt->execute()) {
+        $stmt->close(); $conn->close();
+        echo json_encode(['exito' => true, 'mensaje' => 'Mascota actualizada correctamente']);
+    } else {
+        echo json_encode(['exito' => false, 'mensaje' => 'Error al actualizar: ' . $conn->error]);
     }
-    responder(['ok' => true, 'mensaje' => 'Mascota eliminada.']);
+    exit;
 }
 
-responder(['ok' => false, 'mensaje' => 'Método no permitido.'], 405);
+// ── DELETE: Eliminar mascota ─────────────────────────────────
+if ($metodo === 'DELETE') {
+    $id = (int)($_GET['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['exito' => false, 'mensaje' => 'ID inválido']);
+        exit;
+    }
+
+    $stmt = $conn->prepare('DELETE FROM mascotas WHERE id = ? AND usuario_id = ?');
+    $stmt->bind_param('ii', $id, $usuario_id);
+
+    if ($stmt->execute() && $stmt->affected_rows > 0) {
+        $stmt->close(); $conn->close();
+        echo json_encode(['exito' => true, 'mensaje' => 'Mascota eliminada correctamente']);
+    } else {
+        echo json_encode(['exito' => false, 'mensaje' => 'No se pudo eliminar la mascota']);
+    }
+    exit;
+}
+
+echo json_encode(['exito' => false, 'mensaje' => 'Método no soportado']);
+$conn->close();

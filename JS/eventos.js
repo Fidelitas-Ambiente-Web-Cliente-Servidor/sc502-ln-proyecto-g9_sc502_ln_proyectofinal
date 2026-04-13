@@ -1,124 +1,142 @@
 // ============================================================
-//  PetHealth – eventos.js  (versión API PHP)
+// PetHealth - eventos.js
+// Gestión de eventos de salud via API PHP/MySQL
+// SC-502 | Grupo 9 | Universidad Fidelitas
 // ============================================================
 
-const API_EVENTOS = '../api/eventos.php';
+const API_EVENTOS   = '../API/eventos.php';
+const API_MASCOTAS2 = '../API/mascotas.php';
 
-// ── Cargar eventos desde el servidor ─────────────────────────
+// ── CARGAR EVENTOS ───────────────────────────────────────────
 async function cargarEventos() {
-  const tbody = document.getElementById('tablaEventosBody');
+  let tbody = document.getElementById('tablaEventosBody');
   if (!tbody) return;
-  tbody.innerHTML = '';
+  tbody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm"></div> Cargando...</td></tr>';
 
   try {
-    const res  = await fetch(API_EVENTOS, { credentials: 'include' });
-    const data = await res.json();
+    const resp = await fetch(API_EVENTOS, { credentials: 'same-origin' });
+    const data = await resp.json();
+    tbody.innerHTML = '';
 
-    if (!data.ok) {
-      if (res.status === 401) window.location.href = '../Auth/login.html';
+    if (!data.exito || data.eventos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay eventos registrados.</td></tr>';
       return;
     }
 
-    const eventos = data.eventos;
+    data.eventos.forEach(e => {
+      let estadoHTML = e.estado === 'ok'
+        ? '<span class="badge-ok">✅ Al día</span>'
+        : e.estado === 'proximo'
+        ? '<span class="badge-warning">⚠️ Próximo</span>'
+        : '<span class="badge-danger">❌ Vencido</span>';
 
-    if (eventos.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay eventos registrados.</td></tr>';
-      return;
-    }
-
-    eventos.forEach(e => {
-      let estadoHTML;
-      if (e.estado === 'ok')      estadoHTML = '<span class="badge-ok"> Al día</span>';
-      else if (e.estado === 'proximo') estadoHTML = '<span class="badge-warning"> Próximo</span>';
-      else                        estadoHTML = '<span class="badge-danger"> Vencido</span>';
-
-      const fila = document.createElement('tr');
-      fila.innerHTML =
-        `<td>${e.mascota}</td>
-         <td>${e.tipo}</td>
-         <td>${formatearFecha(e.fecha)}</td>
-         <td>${e.descripcion}</td>
-         <td>${estadoHTML}</td>
-         <td>
-           <button class="btn btn-sm btn-outline-danger"
-                   onclick="eliminarEvento(${e.id})">Eliminar</button>
-         </td>`;
-      tbody.appendChild(fila);
+      let tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + e.mascota_nombre + '</td>' +
+        '<td>' + e.tipo + '</td>' +
+        '<td>' + formatearFecha(e.fecha) + '</td>' +
+        '<td>' + e.descripcion + '</td>' +
+        '<td>' + estadoHTML + '</td>' +
+        '<td><button class="btn btn-sm btn-outline-danger" onclick="eliminarEvento(' + e.id + ')">🗑️</button></td>';
+      tbody.appendChild(tr);
     });
-
   } catch (err) {
-    console.error('Error cargando eventos:', err);
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">⚠️ Error al cargar eventos.</td></tr>';
   }
 }
 
-// ── Agregar evento ───────────────────────────────────────────
+// ── CARGAR MASCOTAS EN SELECT ────────────────────────────────
+async function cargarMascotasSelect() {
+  let sel = document.getElementById('evMascota');
+  if (!sel) return;
+
+  try {
+    const resp = await fetch(API_MASCOTAS2, { credentials: 'same-origin' });
+    const data = await resp.json();
+    sel.innerHTML = '<option value="">-- Seleccione una mascota --</option>';
+    if (data.exito && data.mascotas.length > 0) {
+      data.mascotas.forEach(m => {
+        let emoji = m.especie === 'Perro' ? '🐶' : m.especie === 'Gato' ? '🐱' : '🐾';
+        let opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = emoji + ' ' + m.nombre;
+        sel.appendChild(opt);
+      });
+    } else {
+      sel.innerHTML += '<option disabled>Sin mascotas registradas</option>';
+    }
+  } catch (err) {
+    console.warn('Error al cargar mascotas:', err);
+  }
+}
+
+// ── AGREGAR EVENTO ───────────────────────────────────────────
 async function agregarEvento() {
-  const mascota_id  = document.getElementById('evMascota').value;
-  const tipo        = document.getElementById('evTipo').value;
-  const fecha       = document.getElementById('evFecha').value;
-  const descripcion = document.getElementById('evDescripcion').value;
-  let valido = true;
+  let mascota_id = document.getElementById('evMascota').value;
+  let tipo       = document.getElementById('evTipo').value;
+  let fecha      = document.getElementById('evFecha').value;
+  let descripcion = document.getElementById('evDescripcion').value.trim();
+  let valido     = true;
 
   limpiarFormulario('formEvento');
 
-  if (!campoRequerido(mascota_id)) { mostrarError('evMascota',     'Seleccione una mascota.');  valido = false; }
-  else                               { limpiarError('evMascota'); }
-  if (!campoRequerido(tipo))       { mostrarError('evTipo',        'Seleccione el tipo.');      valido = false; }
-  else                               { limpiarError('evTipo'); }
+  if (!campoRequerido(mascota_id)) { mostrarError('evMascota',     'Seleccione una mascota.'); valido = false; }
+  if (!campoRequerido(tipo))       { mostrarError('evTipo',        'Seleccione el tipo.');     valido = false; }
   if (!campoRequerido(fecha))      { mostrarError('evFecha',       'La fecha es obligatoria.'); valido = false; }
-  else                               { limpiarError('evFecha'); }
-  if (!campoRequerido(descripcion)){ mostrarError('evDescripcion', 'Descripción obligatoria.'); valido = false; }
-  else                               { limpiarError('evDescripcion'); }
-
+  if (!campoRequerido(descripcion)){ mostrarError('evDescripcion', 'La descripción es obligatoria.'); valido = false; }
   if (!valido) return;
 
+  let btn = document.querySelector('#formEvento button[type=button]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
   try {
-    const res  = await fetch(API_EVENTOS, {
+    const resp = await fetch(API_EVENTOS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        mascota_id: parseInt(mascota_id),
-        tipo, fecha, descripcion,
-      }),
+      body: JSON.stringify({ mascota_id: parseInt(mascota_id), tipo, fecha, descripcion }),
+      credentials: 'same-origin'
     });
-    const data = await res.json();
-
-    if (!data.ok) {
-      mostrarAlerta('alertaEvento', '⚠️ ' + data.mensaje, 'danger');
-      return;
+    const data = await resp.json();
+    if (data.exito) {
+      document.getElementById('formEvento').reset();
+      mostrarAlerta('alertaEvento', '✅ Evento registrado correctamente.', 'success');
+      // Volver al tab de historial
+      let tabHistorial = document.querySelector('[data-bs-target="#panelListaEventos"]');
+      if (tabHistorial) new bootstrap.Tab(tabHistorial).show();
+      await cargarEventos();
+    } else {
+      mostrarAlerta('alertaEvento', '❌ ' + data.mensaje, 'danger');
     }
-
-    await cargarEventos();
-    document.getElementById('formEvento').reset();
-    mostrarAlerta('alertaEvento', '✅ Evento registrado correctamente.', 'success');
-
   } catch (err) {
-    mostrarAlerta('alertaEvento', '❌ Error de conexión.', 'danger');
-    console.error(err);
+    mostrarAlerta('alertaEvento', '⚠️ Error de conexión al guardar.', 'warning');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Registrar evento'; }
   }
 }
 
-// ── Eliminar evento ──────────────────────────────────────────
+// ── ELIMINAR EVENTO ──────────────────────────────────────────
 async function eliminarEvento(id) {
-  if (!confirm('¿Eliminar este evento?')) return;
+  if (!confirm('¿Desea eliminar este evento de salud?')) return;
 
   try {
-    const res  = await fetch(`${API_EVENTOS}?id=${id}`, {
+    const resp = await fetch(`${API_EVENTOS}?id=${id}`, {
       method: 'DELETE',
-      credentials: 'include',
+      credentials: 'same-origin'
     });
-    const data = await res.json();
-
-    if (!data.ok) {
+    const data = await resp.json();
+    if (data.exito) {
+      await cargarEventos();
+    } else {
       alert('Error: ' + data.mensaje);
-      return;
     }
-    await cargarEventos();
   } catch (err) {
-    console.error(err);
+    alert('Error al eliminar evento.');
   }
 }
 
-// ── Inicializar ──────────────────────────────────────────────
-window.addEventListener('load', cargarEventos);
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', async function () {
+  await verificarSesion();
+  await cargarEventos();
+  await cargarMascotasSelect();
+});

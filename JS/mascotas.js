@@ -1,169 +1,189 @@
 // ============================================================
-//  PetHealth – mascotas.js  (versión API PHP)
+// PetHealth - mascotas.js
+// CRUD de mascotas via API PHP/MySQL
+// SC-502 | Grupo 9 | Universidad Fidelitas
 // ============================================================
 
-const API_MASCOTAS = '../api/mascotas.php';
+const API_MASCOTAS = '../API/mascotas.php';
+let mascotas = [];
 
-// ── Cargar mascotas desde el servidor ────────────────────────
+// ── CARGAR MASCOTAS ──────────────────────────────────────────
 async function cargarMascotas() {
-  const contenedor = document.getElementById('contenedorMascotas');
-  if (!contenedor) return;
-
   try {
-    const res  = await fetch(API_MASCOTAS, { credentials: 'include' });
-    const data = await res.json();
-
-    if (!data.ok) {
-      if (res.status === 401) window.location.href = '../Auth/login.html';
-      return;
+    const resp = await fetch(API_MASCOTAS, { credentials: 'same-origin' });
+    const data = await resp.json();
+    if (data.exito) {
+      mascotas = data.mascotas;
+      renderMascotas();
+      poblarSelectMascotas();
+    } else {
+      mostrarAlerta('alertaMascota', '❌ ' + data.mensaje, 'danger');
     }
-
-    const mascotas = data.mascotas;
-    contenedor.innerHTML = '';
-
-    if (mascotas.length === 0) {
-      contenedor.innerHTML = '<p class="text-muted text-center mt-3">No hay mascotas registradas aún.</p>';
-      return;
-    }
-
-    mascotas.forEach((m) => {
-      const emoji = m.especie === 'Perro' ? 'Perro' : m.especie === 'Gato' ? 'Gato' : '🐾';
-      const card  = document.createElement('div');
-      card.className = 'col-md-4 mb-4';
-      card.innerHTML =
-        `<div class="card card-pethealth h-100">
-          <div class="card-header text-center">
-            <span style="font-size:2rem">${emoji}</span> ${m.nombre}
-          </div>
-          <div class="card-body">
-            <p><strong>Especie:</strong> ${m.especie}</p>
-            <p><strong>Raza:</strong> ${m.raza}</p>
-            <p><strong>Edad:</strong> ${m.edad} año(s)</p>
-            <p><strong>Peso:</strong> ${m.peso} kg</p>
-            <p><strong>Observaciones:</strong> ${m.observaciones}</p>
-          </div>
-          <div class="card-footer d-flex gap-2">
-            <button class="btn btn-sm btn-outline-primary w-50"
-                    onclick="verHistorial(${m.id}, '${m.nombre}')">Historial</button>
-            <button class="btn btn-sm btn-outline-danger w-50"
-                    onclick="eliminarMascota(${m.id}, '${m.nombre}')">Eliminar</button>
-          </div>
-        </div>`;
-      contenedor.appendChild(card);
-    });
-
-    // Rellenar select de mascotas en el form de eventos (si existe)
-    llenarSelectMascotas(mascotas);
-
   } catch (err) {
-    console.error('Error cargando mascotas:', err);
+    mostrarAlerta('alertaMascota', '⚠️ No se pudo conectar al servidor. Verifique XAMPP/WAMP.', 'warning');
+    console.error(err);
   }
 }
 
-function llenarSelectMascotas(mascotas) {
-  const sel = document.getElementById('evMascota');
-  if (!sel) return;
-  const valorActual = sel.value;
-  // Conservar primera opción vacía
-  sel.innerHTML = '<option value="">Seleccione una mascota...</option>';
-  mascotas.forEach(m => {
-    const opt = document.createElement('option');
-    opt.value = m.id;
-    opt.textContent = m.nombre;
-    sel.appendChild(opt);
+// ── RENDERIZAR TARJETAS ──────────────────────────────────────
+function renderMascotas() {
+  let contenedor = document.getElementById('contenedorMascotas');
+  if (!contenedor) return;
+  contenedor.innerHTML = '';
+
+  if (mascotas.length === 0) {
+    contenedor.innerHTML = '<p class="text-muted text-center mt-4">No hay mascotas registradas aún. ¡Agrega tu primera mascota! 🐾</p>';
+    return;
+  }
+
+  mascotas.forEach((m, i) => {
+    let emoji = m.especie === 'Perro' ? '🐶' : m.especie === 'Gato' ? '🐱' : m.especie === 'Ave' ? '🐦' : m.especie === 'Reptil' ? '🦎' : '🐾';
+    let card = document.createElement('div');
+    card.className = 'col-md-4 mb-4';
+    card.id = 'card-' + m.id;
+    card.innerHTML =
+      '<div class="card card-pethealth h-100">' +
+        '<div class="card-header text-center">' +
+          '<span style="font-size:2rem">' + emoji + '</span> ' + m.nombre +
+        '</div>' +
+        '<div class="card-body">' +
+          '<p><strong>Especie:</strong> ' + m.especie + '</p>' +
+          '<p><strong>Raza:</strong> ' + m.raza + '</p>' +
+          '<p><strong>Edad:</strong> ' + m.edad + ' año(s)</p>' +
+          '<p><strong>Peso:</strong> ' + parseFloat(m.peso).toFixed(1) + ' kg</p>' +
+          '<p><strong>Observaciones:</strong> ' + (m.observaciones || 'Sin observaciones') + '</p>' +
+        '</div>' +
+        '<div class="card-footer d-flex gap-2">' +
+          '<button class="btn btn-sm btn-outline-primary w-50" onclick="verHistorial(' + m.id + ', \'' + m.nombre + '\')">📋 Historial</button>' +
+          '<button class="btn btn-sm btn-outline-danger w-50" onclick="eliminarMascota(' + m.id + ', \'' + m.nombre + '\')">🗑️ Eliminar</button>' +
+        '</div>' +
+      '</div>';
+    contenedor.appendChild(card);
   });
-  if (valorActual) sel.value = valorActual;
 }
 
-// ── Agregar mascota ──────────────────────────────────────────
+// ── POBLAR SELECT DE MASCOTAS ────────────────────────────────
+function poblarSelectMascotas() {
+  let selects = document.querySelectorAll('.select-mascotas');
+  selects.forEach(sel => {
+    let valorActual = sel.value;
+    sel.innerHTML = '<option value="">-- Seleccione una mascota --</option>';
+    mascotas.forEach(m => {
+      let emoji = m.especie === 'Perro' ? '🐶' : m.especie === 'Gato' ? '🐱' : '🐾';
+      let opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = emoji + ' ' + m.nombre + ' (' + m.especie + ')';
+      sel.appendChild(opt);
+    });
+    if (valorActual) sel.value = valorActual;
+  });
+}
+
+// ── AGREGAR MASCOTA ──────────────────────────────────────────
 async function agregarMascota() {
-  const nombre        = document.getElementById('mNombre').value;
-  const especie       = document.getElementById('mEspecie').value;
-  const raza          = document.getElementById('mRaza').value;
-  const edad          = document.getElementById('mEdad').value;
-  const peso          = document.getElementById('mPeso').value;
-  const observaciones = document.getElementById('mObservaciones').value;
-  let valido = true;
+  let nombre   = document.getElementById('mNombre').value.trim();
+  let especie  = document.getElementById('mEspecie').value;
+  let raza     = document.getElementById('mRaza').value.trim();
+  let edad     = document.getElementById('mEdad').value;
+  let peso     = document.getElementById('mPeso').value;
+  let obs      = document.getElementById('mObservaciones').value.trim();
+  let valido   = true;
 
   limpiarFormulario('formMascota');
 
-  if (!campoRequerido(nombre))  { mostrarError('mNombre',  'El nombre es obligatorio.');  valido = false; }
-  else                            { limpiarError('mNombre'); }
-  if (!campoRequerido(especie)) { mostrarError('mEspecie', 'Seleccione la especie.');      valido = false; }
-  else                            { limpiarError('mEspecie'); }
-  if (!campoRequerido(raza))    { mostrarError('mRaza',    'La raza es obligatoria.');     valido = false; }
-  else                            { limpiarError('mRaza'); }
-  if (!campoRequerido(edad) || isNaN(edad) || parseInt(edad) < 0)
-                                  { mostrarError('mEdad',  'Ingrese una edad válida.');    valido = false; }
-  else                            { limpiarError('mEdad'); }
-  if (!campoRequerido(peso) || isNaN(peso) || parseFloat(peso) <= 0)
-                                  { mostrarError('mPeso',  'Ingrese un peso válido.');     valido = false; }
-  else                            { limpiarError('mPeso'); }
-
+  if (!campoRequerido(nombre))  { mostrarError('mNombre',  'El nombre es obligatorio.');    valido = false; }
+  if (!campoRequerido(especie)) { mostrarError('mEspecie', 'Seleccione la especie.');       valido = false; }
+  if (!campoRequerido(raza))    { mostrarError('mRaza',    'La raza es obligatoria.');      valido = false; }
+  if (!campoRequerido(edad) || isNaN(edad) || parseInt(edad) < 0) {
+    mostrarError('mEdad', 'Ingrese una edad válida.'); valido = false;
+  }
+  if (!campoRequerido(peso) || isNaN(peso) || parseFloat(peso) <= 0) {
+    mostrarError('mPeso', 'Ingrese un peso válido.');  valido = false;
+  }
   if (!valido) return;
 
+  let btn = document.querySelector('#formMascota button[type=button]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
   try {
-    const res  = await fetch(API_MASCOTAS, {
+    const resp = await fetch(API_MASCOTAS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        nombre, especie, raza,
-        edad: parseInt(edad),
-        peso: parseFloat(peso),
-        observaciones: observaciones || 'Sin observaciones',
-      }),
+      body: JSON.stringify({ nombre, especie, raza, edad: parseInt(edad), peso: parseFloat(peso), observaciones: obs }),
+      credentials: 'same-origin'
     });
-    const data = await res.json();
-
-    if (!data.ok) {
-      mostrarAlerta('alertaMascota', '⚠️ ' + data.mensaje, 'danger');
-      return;
+    const data = await resp.json();
+    if (data.exito) {
+      await cargarMascotas();
+      document.getElementById('formMascota').reset();
+      mostrarAlerta('alertaMascota', '✅ Mascota <strong>' + nombre + '</strong> registrada exitosamente.', 'success');
+      let tabMascotas = document.getElementById('tab-mascotas');
+      if (tabMascotas) new bootstrap.Tab(tabMascotas).show();
+    } else {
+      mostrarAlerta('alertaMascota', '❌ ' + data.mensaje, 'danger');
     }
-
-    await cargarMascotas();
-    document.getElementById('formMascota').reset();
-    mostrarAlerta('alertaMascota', `✅ Mascota <strong>${nombre}</strong> registrada.`, 'success');
-
-    // Cambiar a pestaña de lista
-    const tabMascotas = document.getElementById('tab-mascotas');
-    if (tabMascotas) new bootstrap.Tab(tabMascotas).show();
-
   } catch (err) {
-    mostrarAlerta('alertaMascota', '❌ Error de conexión.', 'danger');
-    console.error(err);
+    mostrarAlerta('alertaMascota', '⚠️ Error de conexión al guardar.', 'warning');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Registrar mascota'; }
   }
 }
 
-// ── Eliminar mascota ─────────────────────────────────────────
+// ── ELIMINAR MASCOTA ─────────────────────────────────────────
 async function eliminarMascota(id, nombre) {
-  if (!confirm(`¿Está seguro de que desea eliminar a ${nombre}?`)) return;
+  if (!confirm('¿Está seguro de que desea eliminar a ' + nombre + '?\nEsto también eliminará todos sus eventos de salud.')) return;
 
   try {
-    const res  = await fetch(`${API_MASCOTAS}?id=${id}`, {
+    const resp = await fetch(`${API_MASCOTAS}?id=${id}`, {
       method: 'DELETE',
-      credentials: 'include',
+      credentials: 'same-origin'
     });
-    const data = await res.json();
-
-    if (!data.ok) {
-      mostrarAlerta('alertaMascota', '⚠️ ' + data.mensaje, 'danger');
-      return;
+    const data = await resp.json();
+    if (data.exito) {
+      await cargarMascotas();
+      mostrarAlerta('alertaMascota', '🗑️ Mascota <strong>' + nombre + '</strong> eliminada.', 'warning');
+    } else {
+      mostrarAlerta('alertaMascota', '❌ ' + data.mensaje, 'danger');
     }
-    await cargarMascotas();
-    mostrarAlerta('alertaMascota', '⚠️ Mascota eliminada.', 'warning');
   } catch (err) {
-    console.error(err);
+    mostrarAlerta('alertaMascota', '⚠️ Error al eliminar.', 'warning');
   }
 }
 
-// ── Ver historial (modal) ─────────────────────────────────────
-function verHistorial(id, nombre) {
-  const span = document.getElementById('modalNombreMascota');
-  if (span) span.textContent = nombre;
-  const modal = new bootstrap.Modal(document.getElementById('modalHistorial'));
+// ── VER HISTORIAL ────────────────────────────────────────────
+async function verHistorial(mascota_id, nombre) {
+  document.getElementById('modalNombreMascota').textContent = nombre;
+  let tbody = document.getElementById('tablaHistorialBody');
+  tbody.innerHTML = '<tr><td colspan="4" class="text-center"><div class="spinner-border spinner-border-sm"></div> Cargando...</td></tr>';
+
+  let modal = new bootstrap.Modal(document.getElementById('modalHistorial'));
   modal.show();
+
+  try {
+    const resp = await fetch(`../API/eventos.php?mascota_id=${mascota_id}`, { credentials: 'same-origin' });
+    const data = await resp.json();
+    tbody.innerHTML = '';
+    if (!data.exito || data.eventos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Sin eventos registrados.</td></tr>';
+      return;
+    }
+    data.eventos.forEach(e => {
+      let estadoHTML = e.estado === 'ok'
+        ? '<span class="badge-ok">✅ Al día</span>'
+        : e.estado === 'proximo'
+        ? '<span class="badge-warning">⚠️ Próximo</span>'
+        : '<span class="badge-danger">❌ Vencido</span>';
+      let tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + formatearFecha(e.fecha) + '</td><td>' + e.tipo + '</td><td>' + e.descripcion + '</td><td>' + estadoHTML + '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar historial.</td></tr>';
+  }
 }
 
-// ── Inicializar ──────────────────────────────────────────────
-window.addEventListener('load', cargarMascotas);
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', async function () {
+  await verificarSesion();
+  await cargarMascotas();
+});
