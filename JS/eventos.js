@@ -1,13 +1,9 @@
-// ============================================================
-// PetHealth - eventos.js
-// Gestión de eventos de salud via API PHP/MySQL
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
+
 
 const API_EVENTOS   = '../API/eventos.php';
 const API_MASCOTAS2 = '../API/mascotas.php';
 
-// ── CARGAR EVENTOS ───────────────────────────────────────────
+
 async function cargarEventos() {
   let tbody = document.getElementById('tablaEventosBody');
   if (!tbody) return;
@@ -45,7 +41,7 @@ async function cargarEventos() {
   }
 }
 
-// ── CARGAR MASCOTAS EN SELECT ────────────────────────────────
+
 async function cargarMascotasSelect() {
   let sel = document.getElementById('evMascota');
   if (!sel) return;
@@ -70,7 +66,7 @@ async function cargarMascotasSelect() {
   }
 }
 
-// ── AGREGAR EVENTO ───────────────────────────────────────────
+
 async function agregarEvento() {
   let mascota_id = document.getElementById('evMascota').value;
   let tipo       = document.getElementById('evTipo').value;
@@ -114,7 +110,7 @@ async function agregarEvento() {
   }
 }
 
-// ── ELIMINAR EVENTO ──────────────────────────────────────────
+
 async function eliminarEvento(id) {
   if (!confirm('¿Desea eliminar este evento de salud?')) return;
 
@@ -134,7 +130,7 @@ async function eliminarEvento(id) {
   }
 }
 
-// ── INIT ─────────────────────────────────────────────────────
+
 window.addEventListener('load', async function () {
   await verificarSesion();
   await cargarEventos();

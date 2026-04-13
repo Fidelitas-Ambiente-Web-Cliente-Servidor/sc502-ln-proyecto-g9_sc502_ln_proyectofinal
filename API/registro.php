@@ -1,9 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Registro de Usuario
-// POST /API/registro.php
-// Body JSON: { nombre, correo, password }
-// ============================================================
+
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -17,7 +13,7 @@ $nombre   = trim($datos['nombre']   ?? '');
 $correo   = trim($datos['correo']   ?? '');
 $password = trim($datos['password'] ?? '');
 
-// Validaciones básicas del servidor
+
 if (empty($nombre) || empty($correo) || empty($password)) {
     echo json_encode(['exito' => false, 'mensaje' => 'Todos los campos son obligatorios']);
     exit;
@@ -35,7 +31,7 @@ if (strlen($password) < 6) {
 
 $conn = getConexion();
 
-// Verificar si el correo ya existe
+
 $stmt = $conn->prepare('SELECT id FROM usuarios WHERE correo = ?');
 $stmt->bind_param('s', $correo);
 $stmt->execute();
@@ -49,17 +45,16 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
-// Hashear contraseña
+
 $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
-// Insertar usuario
+
 $stmt = $conn->prepare('INSERT INTO usuarios (nombre, correo, password) VALUES (?, ?, ?)');
 $stmt->bind_param('sss', $nombre, $correo, $hash);
 
 if ($stmt->execute()) {
     $usuario_id = $conn->insert_id;
 
-    // Iniciar sesión automáticamente
     $_SESSION['usuario_id'] = $usuario_id;
     $_SESSION['nombre']     = $nombre;
     $_SESSION['correo']     = $correo;

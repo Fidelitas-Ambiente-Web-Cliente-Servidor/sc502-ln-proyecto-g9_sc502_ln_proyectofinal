@@ -1,14 +1,8 @@
 <?php
-// ============================================================
-// PetHealth - API: Mascotas (CRUD)
-// GET    /API/mascotas.php               -> listar mascotas del usuario
-// POST   /API/mascotas.php               -> crear mascota
-// PUT    /API/mascotas.php?id={id}       -> actualizar mascota
-// DELETE /API/mascotas.php?id={id}       -> eliminar mascota
-// ============================================================
+
 require_once 'config.php';
 
-// Verificar autenticación
+
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
     echo json_encode(['exito' => false, 'mensaje' => 'No autenticado. Inicie sesión primero.']);
@@ -19,7 +13,7 @@ $usuario_id = (int) $_SESSION['usuario_id'];
 $metodo     = $_SERVER['REQUEST_METHOD'];
 $conn       = getConexion();
 
-// ── GET: Listar mascotas ──────────────────────────────────────
+
 if ($metodo === 'GET') {
     $stmt = $conn->prepare(
         'SELECT id, nombre, especie, raza, edad, peso, observaciones, created_at
@@ -42,7 +36,7 @@ if ($metodo === 'GET') {
     exit;
 }
 
-// ── POST: Crear mascota ──────────────────────────────────────
+
 if ($metodo === 'POST') {
     $datos  = json_decode(file_get_contents('php://input'), true);
     $nombre = trim($datos['nombre']       ?? '');
@@ -89,7 +83,7 @@ if ($metodo === 'POST') {
     exit;
 }
 
-// ── PUT: Actualizar mascota ──────────────────────────────────
+
 if ($metodo === 'PUT') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id <= 0) {
@@ -97,7 +91,7 @@ if ($metodo === 'PUT') {
         exit;
     }
 
-    // Verificar que la mascota pertenece al usuario
+
     $check = $conn->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
     $check->bind_param('ii', $id, $usuario_id);
     $check->execute();
@@ -132,7 +126,7 @@ if ($metodo === 'PUT') {
     exit;
 }
 
-// ── DELETE: Eliminar mascota ─────────────────────────────────
+
 if ($metodo === 'DELETE') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id <= 0) {

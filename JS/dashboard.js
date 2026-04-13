@@ -1,8 +1,4 @@
-// ============================================================
-// PetHealth - dashboard.js
-// Carga datos del panel principal desde la API PHP/MySQL
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
+
 
 async function cargarDashboard() {
   try {
@@ -14,17 +10,17 @@ async function cargarDashboard() {
       return;
     }
 
-    // Estadísticas
+
     let el = (id) => document.getElementById(id);
     if (el('statMascotas'))  el('statMascotas').textContent  = data.stats.total_mascotas;
     if (el('statEventos'))   el('statEventos').textContent   = data.stats.total_eventos;
     if (el('statProximos'))  el('statProximos').textContent  = data.stats.eventos_proximos;
     if (el('statVencidos'))  el('statVencidos').textContent  = data.stats.eventos_vencidos;
 
-    // Nombre de usuario en la bienvenida
+
     if (el('bienvenidaNombre')) el('bienvenidaNombre').textContent = data.usuario;
 
-    // Alertas de vencidos/próximos
+
     let alertaContainer = el('alertasDashboard');
     if (alertaContainer) {
       alertaContainer.innerHTML = '';
@@ -46,7 +42,7 @@ async function cargarDashboard() {
       }
     }
 
-    // Tabla de últimos eventos
+
     let tbody = el('tablaUltimosEventos');
     if (tbody) {
       tbody.innerHTML = '';
@@ -73,7 +69,7 @@ async function cargarDashboard() {
 
   } catch (err) {
     console.warn('No se pudo cargar el dashboard desde la API:', err);
-    // Mostrar mensaje de error en dashboard
+
     let alertaContainer = document.getElementById('alertasDashboard');
     if (alertaContainer) {
       alertaContainer.innerHTML =

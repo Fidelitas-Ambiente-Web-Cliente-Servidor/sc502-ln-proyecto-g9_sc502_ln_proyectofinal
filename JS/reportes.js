@@ -1,8 +1,4 @@
-// ============================================================
-// PetHealth - reportes.js
-// Reportes desde la API PHP/MySQL
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
+
 
 async function cargarReportes() {
   let tipo      = document.getElementById('filtroTipo')?.value      || 'todos';
@@ -22,7 +18,7 @@ async function cargarReportes() {
     const resp = await fetch(url, { credentials: 'same-origin' });
     const data = await resp.json();
 
-    // Resumen
+
     let el = (id) => document.getElementById(id);
     if (el('resumenTotal'))    el('resumenTotal').textContent    = data.resumen?.total    || 0;
     if (el('resumenOk'))       el('resumenOk').textContent       = data.resumen?.ok       || 0;

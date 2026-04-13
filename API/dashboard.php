@@ -1,8 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Dashboard (estadísticas del usuario)
-// GET /API/dashboard.php
-// ============================================================
+
 require_once 'config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -15,14 +12,14 @@ $usuario_id = (int) $_SESSION['usuario_id'];
 $conn       = getConexion();
 $hoy        = date('Y-m-d');
 
-// Total mascotas
+
 $q = $conn->prepare('SELECT COUNT(*) AS total FROM mascotas WHERE usuario_id = ?');
 $q->bind_param('i', $usuario_id);
 $q->execute();
 $total_mascotas = $q->get_result()->fetch_assoc()['total'];
 $q->close();
 
-// Total eventos
+
 $q = $conn->prepare(
     'SELECT COUNT(*) AS total FROM eventos_salud e
      INNER JOIN mascotas m ON m.id = e.mascota_id
@@ -33,7 +30,7 @@ $q->execute();
 $total_eventos = $q->get_result()->fetch_assoc()['total'];
 $q->close();
 
-// Eventos próximos (dentro de 30 días)
+
 $limite = date('Y-m-d', strtotime('+30 days'));
 $q = $conn->prepare(
     'SELECT COUNT(*) AS total FROM eventos_salud e
@@ -45,7 +42,7 @@ $q->execute();
 $eventos_proximos = $q->get_result()->fetch_assoc()['total'];
 $q->close();
 
-// Eventos vencidos
+
 $q = $conn->prepare(
     'SELECT COUNT(*) AS total FROM eventos_salud e
      INNER JOIN mascotas m ON m.id = e.mascota_id
@@ -56,7 +53,7 @@ $q->execute();
 $eventos_vencidos = $q->get_result()->fetch_assoc()['total'];
 $q->close();
 
-// Últimos 5 eventos
+
 $q = $conn->prepare(
     'SELECT e.id, m.nombre AS mascota, e.tipo, e.fecha, e.descripcion, e.estado
      FROM eventos_salud e
@@ -70,7 +67,7 @@ $q->execute();
 $result         = $q->get_result();
 $ultimos_eventos = [];
 while ($row = $result->fetch_assoc()) {
-    // Recalcular estado en tiempo real
+  
     $evento_date = new DateTime($row['fecha']);
     $hoy_date    = new DateTime('today');
     $diff        = (int) $hoy_date->diff($evento_date)->days;

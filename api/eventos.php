@@ -1,11 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Eventos de Salud (CRUD)
-// GET    /API/eventos.php                     -> listar eventos del usuario
-// GET    /API/eventos.php?mascota_id={id}     -> eventos de una mascota específica
-// POST   /API/eventos.php                     -> crear evento
-// DELETE /API/eventos.php?id={id}             -> eliminar evento
-// ============================================================
+
 require_once 'config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -18,7 +12,7 @@ $usuario_id = (int) $_SESSION['usuario_id'];
 $metodo     = $_SERVER['REQUEST_METHOD'];
 $conn       = getConexion();
 
-// Función para calcular estado según fecha
+
 function calcularEstado(string $fecha): string {
     $hoy   = new DateTime('today');
     $evento = new DateTime($fecha);
@@ -30,12 +24,11 @@ function calcularEstado(string $fecha): string {
     return 'ok';
 }
 
-// ── GET: Listar eventos ──────────────────────────────────────
+
 if ($metodo === 'GET') {
     $mascota_id = isset($_GET['mascota_id']) ? (int)$_GET['mascota_id'] : 0;
 
     if ($mascota_id > 0) {
-        // Eventos de una mascota específica (verificar que pertenece al usuario)
         $stmt = $conn->prepare(
             'SELECT e.id, e.mascota_id, m.nombre AS mascota_nombre, e.tipo, e.fecha,
                     e.descripcion, e.estado, e.created_at
@@ -46,7 +39,7 @@ if ($metodo === 'GET') {
         );
         $stmt->bind_param('ii', $mascota_id, $usuario_id);
     } else {
-        // Todos los eventos del usuario
+
         $stmt = $conn->prepare(
             'SELECT e.id, e.mascota_id, m.nombre AS mascota_nombre, e.tipo, e.fecha,
                     e.descripcion, e.estado, e.created_at
@@ -62,7 +55,7 @@ if ($metodo === 'GET') {
     $result  = $stmt->get_result();
     $eventos = [];
     while ($row = $result->fetch_assoc()) {
-        // Recalcular estado en tiempo real
+
         $row['estado'] = calcularEstado($row['fecha']);
         $eventos[] = $row;
     }
@@ -73,7 +66,6 @@ if ($metodo === 'GET') {
     exit;
 }
 
-// ── POST: Crear evento ───────────────────────────────────────
 if ($metodo === 'POST') {
     $datos      = json_decode(file_get_contents('php://input'), true);
     $mascota_id = (int)  ($datos['mascota_id'] ?? 0);
@@ -86,7 +78,6 @@ if ($metodo === 'POST') {
         exit;
     }
 
-    // Verificar que la mascota pertenece al usuario
     $check = $conn->prepare('SELECT id FROM mascotas WHERE id = ? AND usuario_id = ?');
     $check->bind_param('ii', $mascota_id, $usuario_id);
     $check->execute();
@@ -120,7 +111,6 @@ if ($metodo === 'POST') {
     exit;
 }
 
-// ── DELETE: Eliminar evento ──────────────────────────────────
 if ($metodo === 'DELETE') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id <= 0) {
@@ -128,7 +118,6 @@ if ($metodo === 'DELETE') {
         exit;
     }
 
-    // Verificar propiedad via JOIN
     $stmt = $conn->prepare(
         'DELETE e FROM eventos_salud e
          INNER JOIN mascotas m ON m.id = e.mascota_id

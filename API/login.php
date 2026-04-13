@@ -1,9 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Login de Usuario
-// POST /API/login.php
-// Body JSON: { correo, password }
-// ============================================================
+
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -46,7 +42,7 @@ if (!password_verify($password, $usuario['password'])) {
     exit;
 }
 
-// Sesión exitosa
+
 $_SESSION['usuario_id'] = $usuario['id'];
 $_SESSION['nombre']     = $usuario['nombre'];
 $_SESSION['correo']     = $usuario['correo'];

@@ -1,9 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Formulario de Contacto
-// POST /API/contacto.php
-// Body JSON: { nombre, correo, asunto, mensaje }
-// ============================================================
+
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

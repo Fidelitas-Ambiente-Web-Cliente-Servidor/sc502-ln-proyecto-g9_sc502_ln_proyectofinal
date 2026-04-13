@@ -1,12 +1,9 @@
 <?php
-// ============================================================
-// PetHealth - Configuración de Base de Datos
-// SC-502 Ambiente Web Cliente Servidor | Grupo 9 | Fidelitas
-// ============================================================
+
 
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');       // Cambiar por tu usuario de MySQL
-define('DB_PASS', '');           // Cambiar por tu contraseña de MySQL
+define('DB_USER', 'root');       
+define('DB_PASS', '');           
 define('DB_NAME', 'pethealth');
 define('DB_CHARSET', 'utf8mb4');
 

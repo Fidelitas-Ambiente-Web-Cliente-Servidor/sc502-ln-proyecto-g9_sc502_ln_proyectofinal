@@ -1,10 +1,4 @@
-// ============================================================
-// PetHealth - utils.js
-// Funciones utilitarias reutilizables
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
 
-// ── VALIDACIONES ─────────────────────────────────────────────
 function campoRequerido(valor) {
   return valor !== null && valor !== undefined && String(valor).trim() !== '';
 }
@@ -17,7 +11,7 @@ function validarContrasena(pass) {
   return pass && pass.length >= 6;
 }
 
-// ── ERRORES DE FORMULARIO ────────────────────────────────────
+
 function mostrarError(idCampo, mensaje) {
   let campo = document.getElementById(idCampo);
   if (!campo) return;
@@ -43,7 +37,7 @@ function limpiarFormulario(idForm) {
   });
 }
 
-// ── ALERTAS DINÁMICAS ────────────────────────────────────────
+
 function mostrarAlerta(idContenedor, mensaje, tipo) {
   let contenedor = document.getElementById(idContenedor);
   if (!contenedor) return;
@@ -58,7 +52,7 @@ function mostrarAlerta(idContenedor, mensaje, tipo) {
   }, 5000);
 }
 
-// ── FECHAS ───────────────────────────────────────────────────
+
 function formatearFecha(fechaISO) {
   if (!fechaISO) return '—';
   let [y, m, d] = fechaISO.split('-');

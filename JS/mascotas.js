@@ -1,13 +1,9 @@
-// ============================================================
-// PetHealth - mascotas.js
-// CRUD de mascotas via API PHP/MySQL
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
+
 
 const API_MASCOTAS = '../API/mascotas.php';
 let mascotas = [];
 
-// ── CARGAR MASCOTAS ──────────────────────────────────────────
+
 async function cargarMascotas() {
   try {
     const resp = await fetch(API_MASCOTAS, { credentials: 'same-origin' });
@@ -25,7 +21,7 @@ async function cargarMascotas() {
   }
 }
 
-// ── RENDERIZAR TARJETAS ──────────────────────────────────────
+
 function renderMascotas() {
   let contenedor = document.getElementById('contenedorMascotas');
   if (!contenedor) return;
@@ -62,7 +58,6 @@ function renderMascotas() {
   });
 }
 
-// ── POBLAR SELECT DE MASCOTAS ────────────────────────────────
 function poblarSelectMascotas() {
   let selects = document.querySelectorAll('.select-mascotas');
   selects.forEach(sel => {
@@ -79,7 +74,7 @@ function poblarSelectMascotas() {
   });
 }
 
-// ── AGREGAR MASCOTA ──────────────────────────────────────────
+
 async function agregarMascota() {
   let nombre   = document.getElementById('mNombre').value.trim();
   let especie  = document.getElementById('mEspecie').value;
@@ -129,7 +124,7 @@ async function agregarMascota() {
   }
 }
 
-// ── ELIMINAR MASCOTA ─────────────────────────────────────────
+
 async function eliminarMascota(id, nombre) {
   if (!confirm('¿Está seguro de que desea eliminar a ' + nombre + '?\nEsto también eliminará todos sus eventos de salud.')) return;
 
@@ -150,7 +145,7 @@ async function eliminarMascota(id, nombre) {
   }
 }
 
-// ── VER HISTORIAL ────────────────────────────────────────────
+
 async function verHistorial(mascota_id, nombre) {
   document.getElementById('modalNombreMascota').textContent = nombre;
   let tbody = document.getElementById('tablaHistorialBody');
@@ -182,7 +177,7 @@ async function verHistorial(mascota_id, nombre) {
   }
 }
 
-// ── INIT ─────────────────────────────────────────────────────
+
 window.addEventListener('load', async function () {
   await verificarSesion();
   await cargarMascotas();

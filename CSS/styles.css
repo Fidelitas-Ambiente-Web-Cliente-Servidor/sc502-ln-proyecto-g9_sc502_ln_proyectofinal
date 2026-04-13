@@ -1,5 +1,5 @@
 
-/* ---------- Variables globales ---------- */
+
 :root {
   --color-primario: #2E75B6;
   --color-secundario: #1A4A7A;
@@ -12,7 +12,7 @@
   --transicion: 0.3s ease;
 }
 
-/* ---------- Reset y base ---------- */
+
 * {
   margin: 0;
   padding: 0;
@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---------- Navbar ---------- */
+
 .navbar-pethealth {
   background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
   box-shadow: var(--sombra);
@@ -50,7 +50,7 @@ body {
   color: white !important;
 }
 
-/* ---------- Hero / Banner ---------- */
+
 .hero-section {
   background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
   color: white;
@@ -71,7 +71,7 @@ body {
   margin: 0 auto 2rem;
 }
 
-/* ---------- Cards ---------- */
+
 .card-pethealth {
   border: none;
   border-radius: var(--radio);
@@ -99,7 +99,7 @@ body {
   display: block;
 }
 
-/* ---------- Botones ---------- */
+
 .btn-pethealth {
   background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
   color: white;
@@ -131,7 +131,7 @@ body {
   color: white;
 }
 
-/* ---------- Formularios ---------- */
+
 .form-pethealth .form-control,
 .form-pethealth .form-select {
   border-radius: 8px;
@@ -153,7 +153,7 @@ body {
   margin-bottom: 0.35rem;
 }
 
-/* ---------- Tabla de eventos ---------- */
+
 .tabla-eventos thead {
   background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
   color: white;
@@ -163,7 +163,7 @@ body {
   background-color: rgba(46, 117, 182, 0.06);
 }
 
-/* ---------- Badges de estado ---------- */
+
 .badge-ok {
   background-color: #d4edda;
   color: #155724;
@@ -191,7 +191,7 @@ body {
   font-weight: 600;
 }
 
-/* ---------- Panel Admin ---------- */
+
 .sidebar {
   background: linear-gradient(180deg, var(--color-secundario), var(--color-primario));
   min-height: 100vh;
@@ -218,7 +218,7 @@ body {
   font-size: 1.1rem;
 }
 
-/* ---------- Footer ---------- */
+
 footer {
   background: var(--color-secundario);
   color: rgba(255, 255, 255, 0.8);
@@ -236,7 +236,7 @@ footer a:hover {
   color: white;
 }
 
-/* ---------- Responsive ---------- */
+
 @media (max-width: 768px) {
   .hero-section h1 {
     font-size: 2rem;

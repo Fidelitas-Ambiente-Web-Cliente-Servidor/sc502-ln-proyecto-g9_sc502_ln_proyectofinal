@@ -1,12 +1,8 @@
-// ============================================================
-// PetHealth - auth.js
-// Autenticación con PHP/MySQL via API REST
-// SC-502 | Grupo 9 | Universidad Fidelitas
-// ============================================================
+
 
 const API_BASE = '../API';
 
-// ── LOGIN ────────────────────────────────────────────────────
+// ── LOGIN
 async function handleLogin() {
   let correo     = document.getElementById('loginCorreo').value.trim();
   let contrasena = document.getElementById('loginContrasena').value;
@@ -52,7 +48,7 @@ async function handleLogin() {
   }
 }
 
-// ── REGISTRO ─────────────────────────────────────────────────
+// ── REGISTRO 
 async function handleRegistro() {
   let nombre     = document.getElementById('regNombre').value.trim();
   let correo     = document.getElementById('regCorreo').value.trim();
@@ -97,13 +93,13 @@ async function handleRegistro() {
   }
 }
 
-// ── CERRAR SESIÓN ────────────────────────────────────────────
+// ── CERRAR SESIÓN 
 function cerrarSesion() {
   fetch(`${API_BASE}/sesion.php?accion=logout`, { credentials: 'same-origin' })
     .finally(() => { sessionStorage.clear(); window.location.href = '../Auth/login.html'; });
 }
 
-// ── VERIFICAR SESIÓN ─────────────────────────────────────────
+// ── VERIFICAR SESIÓN
 async function verificarSesion() {
   try {
     const resp = await fetch(`${API_BASE}/sesion.php`, { credentials: 'same-origin' });

@@ -1,10 +1,5 @@
 <?php
-// ============================================================
-// PetHealth - API: Reportes
-// GET /API/reportes.php?tipo={vacunas|desparasitaciones|citas|todos}
-//                      &mascota_id={id}   (opcional)
-//                      &desde={YYYY-MM-DD}&hasta={YYYY-MM-DD}
-// ============================================================
+
 require_once 'config.php';
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -31,7 +26,7 @@ $hasta       = $_GET['hasta']       ?? null;
 
 $tipo_sql = $tipo_map[$tipo_param] ?? null;
 
-// Construir la query dinámica
+
 $sql = 'SELECT e.id, m.nombre AS mascota, m.especie, e.tipo, e.fecha, e.descripcion, e.estado
         FROM eventos_salud e
         INNER JOIN mascotas m ON m.id = e.mascota_id
@@ -83,7 +78,7 @@ while ($row = $result->fetch_assoc()) {
 
 $stmt->close();
 
-// Resumen estadístico
+
 $total   = count($reportes);
 $ok      = count(array_filter($reportes, fn($r) => $r['estado'] === 'ok'));
 $proximos = count(array_filter($reportes, fn($r) => $r['estado'] === 'proximo'));
