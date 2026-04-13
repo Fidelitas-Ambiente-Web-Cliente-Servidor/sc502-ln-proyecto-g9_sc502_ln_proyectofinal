@@ -1,12 +1,21 @@
 
+
+function obtenerEventosStorage() {
+  return JSON.parse(localStorage.getItem("eventos")) || null;
+}
+
+function guardarEventosStorage() {
+  localStorage.setItem("eventos", JSON.stringify(eventos));
+}
+
+
+
 let eventos = [
   { mascota: "Firulais", tipo: "Vacuna", fecha: "2025-08-15", descripcion: "Vacuna antirrábica", estado: "ok" },
   { mascota: "Luna", tipo: "Desparasitación", fecha: "2025-03-20", descripcion: "Tratamiento interno", estado: "proximo" }
 ];
 
-/**
- * Carga los eventos en la tabla del DOM
- */
+
 function cargarEventos() {
   let tbody = document.getElementById("tablaEventosBody");
   if (!tbody) return;
@@ -21,11 +30,11 @@ function cargarEventos() {
     let e = eventos[i];
     let estadoHTML = "";
     if (e.estado === "ok") {
-      estadoHTML = '<span class="badge-ok">✅ Al día</span>';
+      estadoHTML = '<span class="badge-ok"> Al día</span>';
     } else if (e.estado === "proximo") {
-      estadoHTML = '<span class="badge-warning">⚠️ Próximo</span>';
+      estadoHTML = '<span class="badge-warning"> Próximo</span>';
     } else {
-      estadoHTML = '<span class="badge-danger">❌ Vencido</span>';
+      estadoHTML = '<span class="badge-danger"> Vencido</span>';
     }
 
     let fila = document.createElement("tr");
@@ -39,9 +48,7 @@ function cargarEventos() {
   }
 }
 
-/**
- * Registra un nuevo evento de salud desde el formulario
- */
+
 function agregarEvento() {
   let mascota = document.getElementById("evMascota").value;
   let tipo = document.getElementById("evTipo").value;
@@ -66,8 +73,24 @@ function agregarEvento() {
   if (valido) {
     let estado = estadoFecha(fecha);
     eventos.push({ mascota: mascota, tipo: tipo, fecha: fecha, descripcion: descripcion, estado: estado });
+
+    // GUARDAR
+    guardarEventosStorage();
+
     cargarEventos();
     document.getElementById("formEvento").reset();
-    mostrarAlerta("alertaEvento", "✅ Evento registrado correctamente.", "success");
+    mostrarAlerta("alertaEvento", " Evento registrado correctamente.", "success");
   }
 }
+
+
+
+window.addEventListener("load", function () {
+  let datosGuardados = obtenerEventosStorage();
+
+  if (datosGuardados) {
+    eventos = datosGuardados;
+  } else {
+    guardarEventosStorage(); 
+  }
+});

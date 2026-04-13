@@ -1,13 +1,20 @@
 
-// Arreglo que simula las mascotas registradas (se reemplazará con PHP/MySQL)
+
+function obtenerMascotasStorage() {
+  return JSON.parse(localStorage.getItem("mascotas")) || null;
+}
+
+function guardarMascotasStorage() {
+  localStorage.setItem("mascotas", JSON.stringify(mascotas));
+}
+
+
 let mascotas = [
   { nombre: "Firulais", especie: "Perro", raza: "Labrador", edad: 3, peso: 25.5, observaciones: "Alérgico al pollo" },
   { nombre: "Luna", especie: "Gato", raza: "Siamés", edad: 2, peso: 4.2, observaciones: "Vacunas al día" }
 ];
 
-/**
- * Carga las tarjetas de mascotas en el contenedor del DOM
- */
+
 function cargarMascotas() {
   let contenedor = document.getElementById("contenedorMascotas");
   contenedor.innerHTML = "";
@@ -19,7 +26,7 @@ function cargarMascotas() {
 
   for (let i = 0; i < mascotas.length; i++) {
     let m = mascotas[i];
-    let emoji = m.especie === "Perro" ? "🐶" : m.especie === "Gato" ? "🐱" : "🐾";
+    let emoji = m.especie === "Perro" ? "Perro" : m.especie === "Gato" ? "Gato" : "🐾";
     let card = document.createElement("div");
     card.className = "col-md-4 mb-4";
     card.id = "card-" + i;
@@ -36,17 +43,15 @@ function cargarMascotas() {
           '<p><strong>Observaciones:</strong> ' + m.observaciones + '</p>' +
         '</div>' +
         '<div class="card-footer d-flex gap-2">' +
-          '<button class="btn btn-sm btn-outline-primary w-50" onclick="verHistorial(' + i + ')">📋 Historial</button>' +
-          '<button class="btn btn-sm btn-outline-danger w-50" onclick="eliminarMascota(' + i + ')">🗑️ Eliminar</button>' +
+          '<button class="btn btn-sm btn-outline-primary w-50" onclick="verHistorial(' + i + ')"> Historial</button>' +
+          '<button class="btn btn-sm btn-outline-danger w-50" onclick="eliminarMascota(' + i + ')"> Eliminar</button>' +
         '</div>' +
       '</div>';
     contenedor.appendChild(card);
   }
 }
 
-/**
- * Agrega una nueva mascota desde el formulario y la muestra en el DOM
- */
+
 function agregarMascota() {
   let nombre = document.getElementById("mNombre").value;
   let especie = document.getElementById("mEspecie").value;
@@ -84,11 +89,14 @@ function agregarMascota() {
       peso: parseFloat(peso),
       observaciones: observaciones || "Sin observaciones"
     });
+
+    // GUARDAR
+    guardarMascotasStorage();
+
     cargarMascotas();
     document.getElementById("formMascota").reset();
-    mostrarAlerta("alertaMascota", "✅ Mascota <strong>" + nombre + "</strong> registrada exitosamente.", "success");
+    mostrarAlerta("alertaMascota", " Mascota <strong>" + nombre + "</strong> registrada exitosamente.", "success");
 
-    // Ir a la pestaña de mascotas
     let tabMascotas = document.getElementById("tab-mascotas");
     if (tabMascotas) {
       let bsTab = new bootstrap.Tab(tabMascotas);
@@ -97,27 +105,37 @@ function agregarMascota() {
   }
 }
 
-/**
- * Elimina una mascota del arreglo y actualiza el DOM
- * @param {number} indice - Índice en el arreglo mascotas
- */
+
 function eliminarMascota(indice) {
   let nombre = mascotas[indice].nombre;
   let confirmar = confirm("¿Está seguro de que desea eliminar a " + nombre + "?");
   if (confirmar) {
     mascotas.splice(indice, 1);
+
+    // GUARDAR
+    guardarMascotasStorage();
+
     cargarMascotas();
-    mostrarAlerta("alertaMascota", "🗑️ Mascota eliminada.", "warning");
+    mostrarAlerta("alertaMascota", " Mascota eliminada.", "warning");
   }
 }
 
-/**
- * Muestra el modal de historial de salud de una mascota
- * @param {number} indice - Índice de la mascota
- */
+
 function verHistorial(indice) {
   let m = mascotas[indice];
   document.getElementById("modalNombreMascota").textContent = m.nombre;
   let modal = new bootstrap.Modal(document.getElementById("modalHistorial"));
   modal.show();
 }
+
+
+
+window.addEventListener("load", function () {
+  let datosGuardados = obtenerMascotasStorage();
+
+  if (datosGuardados) {
+    mascotas = datosGuardados;
+  } else {
+    guardarMascotasStorage(); // guardar las de ejemplo la primera vez
+  }
+});

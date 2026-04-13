@@ -12,14 +12,14 @@
   <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg navbar-pethealth">
     <div class="container-fluid">
-      <a class="navbar-brand" href="../index.html">🐾 PetHealth</a>
+      <a class="navbar-brand" href="../index.html"> PetHealth</a>
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <span class="nav-link text-white" id="nombreUsuario">👤 Usuario</span>
+            <span class="nav-link text-white" id="nombreUsuario"> Usuario</span>
           </li>
           <li class="nav-item">
             <button class="btn btn-outline-light btn-sm ms-2" onclick="cerrarSesion()">Cerrar sesión</button>
@@ -78,7 +78,7 @@
 
         <!-- Alertas del sistema -->
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <strong>⚠️ Recordatorio:</strong> Luna tiene una desparasitación próxima a vencer.
+          <strong> Recordatorio:</strong> Luna tiene una desparasitación próxima a vencer.
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
@@ -86,7 +86,7 @@
         <div class="row g-3 mb-4">
           <div class="col-md-3">
             <div class="card card-pethealth text-center p-3">
-              <span style="font-size:2rem">🐾</span>
+              <span style="font-size:2rem"></span>
               <h3 class="fw-bold mt-2" style="color: var(--color-primario);" id="totalMascotas">2</h3>
               <p class="text-muted small mb-0">Mascotas registradas</p>
             </div>
@@ -100,14 +100,14 @@
           </div>
           <div class="col-md-3">
             <div class="card card-pethealth text-center p-3">
-              <span style="font-size:2rem">🔔</span>
+              <span style="font-size:2rem"></span>
               <h3 class="fw-bold mt-2" style="color: var(--color-alerta);">1</h3>
               <p class="text-muted small mb-0">Recordatorios activos</p>
             </div>
           </div>
           <div class="col-md-3">
             <div class="card card-pethealth text-center p-3">
-              <span style="font-size:2rem">✅</span>
+              <span style="font-size:2rem"></span>
               <h3 class="fw-bold mt-2" style="color: #28a745;">1</h3>
               <p class="text-muted small mb-0">Eventos al día</p>
             </div>
@@ -120,15 +120,15 @@
             <div class="card card-pethealth">
               <div class="card-header">🐾 Accesos rápidos</div>
               <div class="card-body d-flex flex-column gap-2">
-                <a href="../Mascotas/mascotas.html" class="btn btn-pethealth">➕ Agregar mascota</a>
+                <a href="../Mascotas/mascotas.html" class="btn btn-pethealth"> Agregar mascota</a>
                 <a href="../Eventos/eventos.html" class="btn btn-outline-pethealth">💉 Registrar evento de salud</a>
-                <a href="../Reportes/reportes.html" class="btn btn-outline-pethealth">📊 Ver reportes</a>
+                <a href="../Reportes/reportes.html" class="btn btn-outline-pethealth"> Ver reportes</a>
               </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="card card-pethealth">
-              <div class="card-header">📋 Últimos eventos</div>
+              <div class="card-header"> Últimos eventos</div>
               <div class="card-body p-0">
                 <table class="table tabla-eventos mb-0">
                   <thead>
@@ -142,12 +142,12 @@
                     <tr>
                       <td>Firulais</td>
                       <td>Vacuna</td>
-                      <td><span class="badge-ok">✅ Al día</span></td>
+                      <td><span class="badge-ok"> Al día</span></td>
                     </tr>
                     <tr>
                       <td>Luna</td>
                       <td>Desparasitación</td>
-                      <td><span class="badge-warning">⚠️ Próximo</span></td>
+                      <td><span class="badge-warning"> Próximo</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -160,12 +160,12 @@
     </div>
   </div>
 
-  <!-- MODAL HISTORIAL -->
+  
   <div class="modal fade" id="modalHistorial" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" style="background: linear-gradient(135deg, #2E75B6, #1A4A7A); color: white;">
-          <h5 class="modal-title">📋 Historial de salud: <span id="modalNombreMascota"></span></h5>
+          <h5 class="modal-title"> Historial de salud: <span id="modalNombreMascota"></span></h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -176,7 +176,7 @@
             <tbody>
               <tr>
                 <td>15/08/2025</td><td>Vacuna</td><td>Vacuna antirrábica</td>
-                <td><span class="badge-ok">✅ Al día</span></td>
+                <td><span class="badge-ok"> Al día</span></td>
               </tr>
             </tbody>
           </table>
@@ -194,8 +194,88 @@
     // Mostrar nombre de usuario desde sesión
     let usuario = sessionStorage.getItem("usuario");
     if (usuario) {
-      document.getElementById("nombreUsuario").textContent = "👤 " + usuario;
+      document.getElementById("nombreUsuario").textContent = "Usuario " + usuario;
     }
   </script>
+
+  <script>
+
+
+// Obtener datos
+function obtenerMascotas() {
+  return JSON.parse(localStorage.getItem("mascotas")) || [];
+}
+
+function obtenerEventos() {
+  return JSON.parse(localStorage.getItem("eventos")) || [];
+}
+
+// Cargar datos en dashboard
+function cargarDashboard() {
+  let mascotas = obtenerMascotas();
+  let eventos = obtenerEventos();
+
+  // Totales
+  document.getElementById("totalMascotas").textContent = mascotas.length;
+  document.getElementById("totalEventos").textContent = eventos.length;
+
+  // Contadores
+  let alDia = 0;
+  let proximos = 0;
+
+  eventos.forEach(e => {
+    if (e.estado === "ok") alDia++;
+    else if (e.estado === "proximo") proximos++;
+  });
+
+  // Actualizar tarjetas
+  let cards = document.querySelectorAll(".card h3");
+
+  if (cards.length >= 4) {
+    cards[2].textContent = proximos; 
+    cards[3].textContent = alDia;    
+  }
+
+  // ultimos eventos 
+  let tbody = document.querySelector(".tabla-eventos tbody");
+
+  if (tbody) {
+    tbody.innerHTML = "";
+
+    if (eventos.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Sin eventos</td></tr>';
+      return;
+    }
+
+    // Mostrar 
+    let ultimos = eventos.slice(-5).reverse();
+
+    ultimos.forEach(e => {
+      let estadoHTML = "";
+
+      if (e.estado === "ok") {
+        estadoHTML = '<span class="badge-ok"> Al día</span>';
+      } else if (e.estado === "proximo") {
+        estadoHTML = '<span class="badge-warning"> Próximo</span>';
+      } else {
+        estadoHTML = '<span class="badge-danger"> Vencido</span>';
+      }
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${e.mascota}</td>
+          <td>${e.tipo}</td>
+          <td>${estadoHTML}</td>
+        </tr>
+      `;
+    });
+  }
+}
+
+// Ejecutar
+window.addEventListener("load", cargarDashboard);
+</script>
 </body>
 </html>
+
+
