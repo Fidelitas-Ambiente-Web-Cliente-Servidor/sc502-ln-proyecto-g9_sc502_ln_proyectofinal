@@ -1,144 +1,120 @@
+// ============================================================
+//  PetHealth – auth.js  (versión API PHP)
+//  Reemplaza el uso de localStorage por llamadas fetch() al backend
+// ============================================================
 
+const API_BASE = '../api'; // ajuste si el backend está en otra ruta
 
-function obtenerUsuarios() {
-  return JSON.parse(localStorage.getItem("usuarios")) || [];
-}
-
-function guardarUsuarios(usuarios) {
-  localStorage.setItem("usuarios", JSON.stringify(usuarios));
-}
-
-
-
-function handleLogin() {
-  let correo = document.getElementById("loginCorreo").value;
-  let contrasena = document.getElementById("loginContrasena").value;
+// ── LOGIN ────────────────────────────────────────────────────
+async function handleLogin() {
+  const correo    = document.getElementById('loginCorreo').value;
+  const contrasena = document.getElementById('loginContrasena').value;
   let valido = true;
 
-  limpiarFormulario("formLogin");
+  limpiarFormulario('formLogin');
 
   if (!campoRequerido(correo)) {
-    mostrarError("loginCorreo", "El correo es obligatorio.");
+    mostrarError('loginCorreo', 'El correo es obligatorio.');
     valido = false;
   } else if (!validarCorreo(correo)) {
-    mostrarError("loginCorreo", "Ingrese un correo válido (ejemplo@correo.com).");
+    mostrarError('loginCorreo', 'Ingrese un correo válido (ejemplo@correo.com).');
     valido = false;
   } else {
-    limpiarError("loginCorreo");
+    limpiarError('loginCorreo');
   }
 
   if (!campoRequerido(contrasena)) {
-    mostrarError("loginContrasena", "La contraseña es obligatoria.");
+    mostrarError('loginContrasena', 'La contraseña es obligatoria.');
     valido = false;
   } else if (!validarContrasena(contrasena)) {
-    mostrarError("loginContrasena", "La contraseña debe tener al menos 6 caracteres.");
+    mostrarError('loginContrasena', 'La contraseña debe tener al menos 6 caracteres.');
     valido = false;
   } else {
-    limpiarError("loginContrasena");
+    limpiarError('loginContrasena');
   }
 
-  if (valido) {
+  if (!valido) return;
 
-    //  VALIDAR USUARIO REAL
-    let usuarios = obtenerUsuarios();
+  try {
+    const res  = await fetch(`${API_BASE}/auth.php?accion=login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',                  // envía la cookie de sesión PHP
+      body: JSON.stringify({ correo, contrasena }),
+    });
+    const data = await res.json();
 
-    let usuario = usuarios.find(u => 
-      u.correo === correo && u.password === contrasena
-    );
-
-    if (!usuario) {
-      mostrarAlerta("alertaLogin", " Correo o contraseña incorrectos.", "danger");
+    if (!data.ok) {
+      mostrarAlerta('alertaLogin', '⚠️ ' + data.mensaje, 'danger');
       return;
     }
 
-   
-    let nombre = usuario.nombre;
-    guardarSesion(nombre);
+    // Guardar solo nombre para mostrarlo en la UI (sesión real está en el servidor)
+    sessionStorage.setItem('usuario', data.usuario.nombre);
+    sessionStorage.setItem('rol', data.usuario.rol);
 
-    mostrarAlerta("alertaLogin", " Sesión iniciada correctamente. Redirigiendo...", "success");
+    mostrarAlerta('alertaLogin', '✅ Sesión iniciada. Redirigiendo...', 'success');
+    setTimeout(() => { window.location.href = '../PanelAdmin/dashboard.html'; }, 1500);
 
-    setTimeout(function () {
-      window.location.href = "../PanelAdmin/dashboard.html";
-    }, 1500);
+  } catch (err) {
+    mostrarAlerta('alertaLogin', '❌ Error de conexión con el servidor.', 'danger');
+    console.error(err);
   }
 }
 
-
-
-function handleRegistro() {
-  let nombre = document.getElementById("regNombre").value;
-  let correo = document.getElementById("regCorreo").value;
-  let contrasena = document.getElementById("regContrasena").value;
-  let confirmar = document.getElementById("regConfirmar").value;
-  let terminos = document.getElementById("regTerminos").checked;
+// ── REGISTRO ─────────────────────────────────────────────────
+async function handleRegistro() {
+  const nombre    = document.getElementById('regNombre').value;
+  const correo    = document.getElementById('regCorreo').value;
+  const contrasena = document.getElementById('regContrasena').value;
+  const confirmar  = document.getElementById('regConfirmar').value;
+  const terminos   = document.getElementById('regTerminos').checked;
   let valido = true;
 
-  limpiarFormulario("formRegistro");
+  limpiarFormulario('formRegistro');
 
-  if (!campoRequerido(nombre)) {
-    mostrarError("regNombre", "El nombre completo es obligatorio.");
-    valido = false;
-  } else {
-    limpiarError("regNombre");
-  }
+  if (!campoRequerido(nombre))   { mostrarError('regNombre',    'El nombre completo es obligatorio.'); valido = false; }
+  else                             { limpiarError('regNombre'); }
 
-  if (!campoRequerido(correo)) {
-    mostrarError("regCorreo", "El correo es obligatorio.");
-    valido = false;
-  } else if (!validarCorreo(correo)) {
-    mostrarError("regCorreo", "Ingrese un correo válido.");
-    valido = false;
-  } else {
-    limpiarError("regCorreo");
-  }
+  if (!campoRequerido(correo))   { mostrarError('regCorreo',    'El correo es obligatorio.');         valido = false; }
+  else if (!validarCorreo(correo)){ mostrarError('regCorreo',   'Ingrese un correo válido.');         valido = false; }
+  else                             { limpiarError('regCorreo'); }
 
-  if (!validarContrasena(contrasena)) {
-    mostrarError("regContrasena", "La contraseña debe tener al menos 6 caracteres.");
-    valido = false;
-  } else {
-    limpiarError("regContrasena");
-  }
+  if (!validarContrasena(contrasena)) { mostrarError('regContrasena', 'Mínimo 6 caracteres.'); valido = false; }
+  else                                 { limpiarError('regContrasena'); }
 
-  if (contrasena !== confirmar) {
-    mostrarError("regConfirmar", "Las contraseñas no coinciden.");
-    valido = false;
-  } else if (campoRequerido(confirmar)) {
-    limpiarError("regConfirmar");
-  }
+  if (contrasena !== confirmar)  { mostrarError('regConfirmar', 'Las contraseñas no coinciden.');     valido = false; }
+  else if (campoRequerido(confirmar)) { limpiarError('regConfirmar'); }
 
   if (!terminos) {
-    mostrarAlerta("alertaRegistro", " Debe aceptar los términos y condiciones.", "warning");
+    mostrarAlerta('alertaRegistro', '⚠️ Debe aceptar los términos y condiciones.', 'warning');
     valido = false;
   }
 
-  if (valido) {
+  if (!valido) return;
 
-    // GUARDAR USUARIO
-    let usuarios = obtenerUsuarios();
+  try {
+    const res  = await fetch(`${API_BASE}/auth.php?accion=registro`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ nombre, correo, contrasena }),
+    });
+    const data = await res.json();
 
-    let existe = usuarios.find(u => u.correo === correo);
-
-    if (existe) {
-      mostrarAlerta("alertaRegistro", " Este correo ya está registrado.", "danger");
+    if (!data.ok) {
+      mostrarAlerta('alertaRegistro', '⚠️ ' + data.mensaje, 'danger');
       return;
     }
 
-    let nuevoUsuario = {
-      nombre: nombre,
-      correo: correo,
-      password: contrasena
-    };
+    sessionStorage.setItem('usuario', data.usuario.nombre);
+    sessionStorage.setItem('rol', data.usuario.rol);
 
-    usuarios.push(nuevoUsuario);
-    guardarUsuarios(usuarios);
+    mostrarAlerta('alertaRegistro', '✅ Cuenta creada. Redirigiendo...', 'success');
+    setTimeout(() => { window.location.href = '../PanelAdmin/dashboard.html'; }, 1500);
 
-    
-    guardarSesion(nombre);
-
-    mostrarAlerta("alertaRegistro", " Cuenta creada exitosamente. Redirigiendo...", "success");
-
-    setTimeout(function () {
-      window.location.href = "../PanelAdmin/dashboard.html";
-    }, 1500);
+  } catch (err) {
+    mostrarAlerta('alertaRegistro', '❌ Error de conexión con el servidor.', 'danger');
+    console.error(err);
   }
 }

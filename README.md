@@ -1,75 +1,110 @@
-# PetHealth
+# PetHealth – Backend PHP + MySQL
+### Grupo 9 | SC-502 | Universidad Fidelitas
 
-**Aplicación web para gestión de salud preventiva de mascotas**
+---
 
-Proyecto Final — SC-502 Ambiente Web Cliente Servidor  
-Grupo 9 | Horario LN | Universidad Fidelitas
-
-## Integrantes
-
-| Nombre | Contribuciones |
-|---|---|
-| Fabian Mora C. | Estructura HTML principal, index.html, navbar |
-| Axel Segura A. | CSS3 global, responsive design, variables |
-| Edmilson Flores S. | JavaScript: validaciones, DOM, mascotas, eventos |
-| Walter Chacón C. | Dashboard, módulo de eventos, reportes, contacto |
-
-
-## Estructura del proyecto
+## Estructura de archivos generados
 
 ```
-pethealth/
-├── index.html              # Página de inicio
-├── README.md
-├── CSS/
-│   └── styles.css          # Estilos globales con variables CSS3
+backend/
+├── database.sql          ← Ejecute esto primero en MySQL
+├── config/
+│   ├── db.php            ← Credenciales de conexión
+│   └── helpers.php       ← Funciones de utilidad (responder, sesión)
+├── api/
+│   ├── auth.php          ← Login / Registro / Logout / Verificar sesión
+│   ├── mascotas.php      ← CRUD de mascotas
+│   └── eventos.php       ← CRUD de eventos
+└── JS/                   ← Archivos JS actualizados (reemplazar los originales)
+    ├── auth.js
+    ├── mascotas.js
+    ├── eventos.js
+    └── utils.js
+```
+
+---
+
+## Instalación paso a paso
+
+### 1. Base de datos
+```sql
+-- En phpMyAdmin o la terminal MySQL:
+SOURCE /ruta/a/backend/database.sql;
+```
+
+### 2. Configurar conexión
+Edite `config/db.php` con sus credenciales:
+```php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');      // su usuario MySQL
+define('DB_PASS', '');          // su contraseña
+define('DB_NAME', 'pethealth');
+```
+
+### 3. Copiar archivos al proyecto
+```
+proyecto/
+├── api/              ← carpeta nueva (copiar backend/api/)
+├── config/           ← carpeta nueva (copiar backend/config/)
 ├── JS/
-│   ├── utils.js            # Funciones reutilizables (validaciones, alertas)
-│   ├── auth.js             # Lógica de autenticación
-│   ├── mascotas.js         # Gestión de mascotas (DOM dinámico)
-│   └── eventos.js          # Gestión de eventos de salud
-├── Auth/
-│   ├── login.html          # Inicio de sesión
-│   └── registro.html       # Registro de usuario
-├── PanelAdmin/
-│   └── dashboard.html      # Panel principal con resumen
-├── Mascotas/
-│   └── mascotas.html       # Listado y registro de mascotas
-├── Eventos/
-│   └── eventos.html        # Historial y registro de eventos de salud
-├── Reportes/
-│   └── reportes.html       # Reportes con filtros
-├── Informacion/
-│   └── informacion.html    # Página informativa y FAQ
-├── Contacto/
-│   └── contacto.html       # Formulario de contacto
-└── img/                    # Imágenes del proyecto
+│   ├── auth.js       ← reemplazar con backend/JS/auth.js
+│   ├── mascotas.js   ← reemplazar con backend/JS/mascotas.js
+│   ├── eventos.js    ← reemplazar con backend/JS/eventos.js
+│   └── utils.js      ← reemplazar con backend/JS/utils.js
+└── (resto del proyecto sin cambios)
 ```
 
-## Tecnologías utilizadas
+### 4. Servidor
+El proyecto necesita un servidor con PHP 7.4+ y MySQL. Opciones:
+- **XAMPP / WAMP / MAMP** (local)
+- **Laragon** (recomendado para Windows)
+- Hosting compartido con PHP y MySQL
 
-- **HTML5** — Estructura semántica de las páginas
-- **CSS3** — Estilos con variables CSS, Flexbox y media queries
-- **Bootstrap 5.3** — Componentes UI responsivos (visto en clase Unidad 2.3)
-- **JavaScript** — Validaciones, manipulación del DOM, gestión de sesión
+> **Importante:** Abra el proyecto desde `http://localhost/pethealth/` y **no** desde `file://`. Las cookies de sesión PHP requieren HTTP.
 
+---
 
+## Credenciales de prueba
 
-## ejecutar
+| Rol     | Correo              | Contraseña  |
+|---------|---------------------|-------------|
+| Admin   | admin@pethealth.com | admin123    |
+| Usuario | demo@pethealth.com  | usuario123  |
 
-1. Clonar el repositorio
-2. Abrir `index.html` en el navegador
+---
 
+## Endpoints de la API
 
-## Módulos implementados (Avance 2 )
+### Auth (`api/auth.php`)
+| Método | Parámetro       | Descripción          |
+|--------|-----------------|----------------------|
+| POST   | ?accion=login   | Iniciar sesión       |
+| POST   | ?accion=registro| Crear cuenta         |
+| POST   | ?accion=logout  | Cerrar sesión        |
+| GET    | ?accion=sesion  | Verificar sesión     |
 
-- Página de inicio con hero y cards de funcionalidades
-- Autenticación: Login y Registro con validaciones
-- Panel principal (Dashboard) con sidebar y resumen
-- Gestión de mascotas (CRUD con DOM dinámico)
-- Eventos de salud (vacunas, desparasitaciones, citas)
-- Reportes con filtros
-- Página informativa con acordeón Bootstrap
-- Formulario de contacto con validación
+### Mascotas (`api/mascotas.php`)
+| Método | Query     | Descripción         |
+|--------|-----------|---------------------|
+| GET    | —         | Listar mis mascotas |
+| POST   | —         | Crear mascota       |
+| PUT    | ?id={n}   | Actualizar mascota  |
+| DELETE | ?id={n}   | Eliminar mascota    |
 
-*SC-502 Ambiente Web Cliente Servidor — Universidad Fidelitas 2025*
+### Eventos (`api/eventos.php`)
+| Método | Query     | Descripción        |
+|--------|-----------|--------------------|
+| GET    | —         | Listar mis eventos |
+| POST   | —         | Crear evento       |
+| PUT    | ?id={n}   | Actualizar evento  |
+| DELETE | ?id={n}   | Eliminar evento    |
+
+---
+
+## Cambios respecto al frontend original
+
+- `localStorage` → **MySQL** (persistencia real en servidor)
+- `sessionStorage` → **PHP Sessions** (autenticación segura)
+- Contraseñas hasheadas con **bcrypt** (`password_hash`)
+- Cada usuario solo ve **sus propias** mascotas y eventos
+- El estado de los eventos (ok/próximo/vencido) se calcula **en el servidor**
